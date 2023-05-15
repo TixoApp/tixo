@@ -36,7 +36,7 @@ const thetaTestnet: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [thetaTestnet, goerli],
+  [goerli, thetaTestnet], // TODO: switch this back
   [publicProvider()]
 );
 

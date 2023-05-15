@@ -33,6 +33,14 @@
   object-fit: cover;
 }
 
+.title {
+  font-style: normal;
+  font-weight: 600;
+  font-size: 36px;
+  text-align: center;
+  margin-bottom: -8px;
+}
+
 .content {
   justify-content: center;
   height: 100vh;
@@ -149,23 +157,17 @@
 }
 
 .previewContainer {
-  position: relative;
-  border: 3px solid #ffffff;
+  top: -8px;
+  width: 400px !important;
+  height: 400px !important;
+  position: absolute;
   background: #18151e;
-  border: 1px solid #211e27;
   border-radius: 15px;
   display: flex;
   justify-content: center !important;
   align-items: center !important;
-  font-weight: 500;
-  font-size: 24px;
-  line-height: 31px;
-  color: white;
   z-index: 0;
   cursor: pointer;
-
-  width: 500px;
-  height: 500px;
 }
 
 .input {
@@ -177,4 +179,6 @@
 
 .inputContainer {
   align-items: flex-start !important;
+  padding-left: 2px;
+  padding-right: 2px;
 }

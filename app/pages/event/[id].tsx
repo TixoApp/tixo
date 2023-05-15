@@ -100,7 +100,7 @@ export default function EventPage() {
               <Text>Event Name: {event.eventName}</Text>
               <Text>Description: {event.description}</Text>
               <Text>Hosted by: {event.hostName}</Text>
-              <Text>Location: {event.location}</Text>
+              <Text>Location: {event.location.label}</Text>
               <Text>Date: {event.date}</Text>
               <Text>Time: {event.time}</Text>
               <Text>
