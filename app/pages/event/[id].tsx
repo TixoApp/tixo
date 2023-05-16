@@ -1,7 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { Button, Spinner, Text, VStack } from "@chakra-ui/react";
+import {
+  Button,
+  HStack,
+  Spinner,
+  Text,
+  VStack,
+  Image,
+  Box,
+} from "@chakra-ui/react";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
 import { useAccount, useSigner } from "wagmi";
@@ -9,11 +17,16 @@ import { ethers } from "ethers";
 import TixoCollectionV1 from "@data/TixoCollectionV1.json";
 import QRCode from "react-qr-code";
 import ReactCardFlip from "react-card-flip";
+import { format } from "date-fns";
+import { FaMapMarkerAlt, FaSmile } from "react-icons/fa";
+import { useToast } from "@chakra-ui/react";
+import { ImageContext } from "pages/_app";
+import withTransition from "@components/withTransition";
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 const CID = "";
 
-export default function EventPage() {
+function EventPage() {
   const { address } = useAccount();
   const { data: signer, isError } = useSigner();
   const [event, setEvent] = useState<Event | null>(null);
@@ -23,6 +36,22 @@ export default function EventPage() {
   const [ticketId, setTicketId] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [width, setWidth] = useState<number>(window.innerWidth);
+  const toast = useToast();
+  const { setSelectedImage } = useContext(ImageContext);
+
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowSizeChange);
+    return () => {
+      window.removeEventListener("resize", handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = width <= 500;
 
   const handleFlip = () => setIsFlipped(!isFlipped);
 
@@ -86,57 +115,210 @@ export default function EventPage() {
     fetchEvent();
   }, [id]);
 
+  useEffect(() => {
+    if (event && event.bgImage) {
+      setSelectedImage("/3-mobile.png");
+    }
+  }, [event]);
+
+  const handleShareEvent = () => {
+    const copyShareMessage = `Check out this event on TIXO: ${window.location.href}`;
+
+    navigator.clipboard
+      .writeText(copyShareMessage)
+      .then(() => {
+        toast({
+          title: "Success",
+          description: "Event URL copied to clipboard!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      })
+      .catch((err) => {
+        console.error("Failed to copy text: ", err);
+        toast({
+          title: "Error",
+          description: "Failed to copy URL",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      });
+  };
+
   const qrUrl = `http://192.168.1.6:3000/validate?eventId=${id}&ticketId=${ticketId}&address=${address}`;
+
+  const formattedTime = useMemo(() => {
+    if (!event) return "";
+
+    return new Date(event.date * 1000).toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZoneName: "short",
+    });
+  }, [event]);
 
   console.log(qrUrl);
 
   return (
     <main className={styles.main}>
-      <ReactCardFlip isFlipped={isFlipped} flipDirection="horizontal">
-        <VStack>
-          {/* The front of the card */}
-          {event ? (
-            <>
-              <Text>Event Name: {event.eventName}</Text>
-              <Text>Description: {event.description}</Text>
-              <Text>Hosted by: {event.hostName}</Text>
-              <Text>Location: {event.location.label}</Text>
-              <Text>Date: {event.date}</Text>
-              <Text>Time: {event.time}</Text>
-              <Text>
-                Number of Tickets Remaining:{" "}
-                {event.maxTickets - Object.keys(event.attendees).length}/
-                {event.maxTickets}
-              </Text>
-              <Text>Cost per Ticket: {event.costPerTicket}</Text>
-              <Text>Is Token Gated: {event.isTokenGated ? "Yes" : "No"}</Text>
-              {!ticketId ? (
-                <Button onClick={handleMintTicket} className={styles.button}>
-                  {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
-                </Button>
-              ) : (
-                <Button onClick={handleFlip} className={styles.button}>
-                  View ticket
-                </Button>
-              )}
-            </>
-          ) : (
-            <Text>Loading...</Text>
-          )}
-        </VStack>
+      {!isMobile ? (
+        event ? (
+          <HStack>
+            <VStack alignItems="flex-start" gap={3} maxWidth="500px">
+              <Text className={styles.eventTitle}>{event.eventName}</Text>
+              <VStack alignItems="flex-start">
+                <Text className={styles.eventDate}>
+                  {format(new Date(event.date), "eeee, MMMM do")}
+                </Text>
+                <Text className={styles.eventTime}>{formattedTime}</Text>
+              </VStack>
 
-        <VStack>
-          {/* The back of the card */}
-          {ticketId && (
-            <>
-              <QRCode value={qrUrl} />
-              <Button onClick={handleFlip} className={styles.button}>
-                Go back
-              </Button>
-            </>
-          )}
-        </VStack>
-      </ReactCardFlip>
+              <VStack alignItems="flex-start">
+                <HStack>
+                  <FaSmile />
+                  <Text>
+                    Hosted by{" "}
+                    <span className={styles.eventHost}>
+                      {event.hostName.toLocaleUpperCase()}
+                    </span>
+                  </Text>
+                </HStack>
+                <HStack>
+                  <FaMapMarkerAlt />
+                  <Text className={styles.eventLocation}>
+                    {" "}
+                    {event.location.value.structured_formatting.main_text}
+                  </Text>
+                </HStack>
+              </VStack>
+              <Text>{event.description}</Text>
+              <VStack alignItems="flex-start">
+                <Text>
+                  Number of Tickets Remaining:{" "}
+                  {event.maxTickets - Object.keys(event.attendees).length}/
+                  {event.maxTickets}
+                </Text>
+                <Text>Cost per Ticket: {event.costPerTicket}</Text>
+              </VStack>
+              {/* <Text>Is Token Gated: {event.isTokenGated ? "Yes" : "No"}</Text> */}
+              <HStack gap={1}>
+                {!ticketId ? (
+                  <Button onClick={handleMintTicket} className={styles.button}>
+                    {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
+                  </Button>
+                ) : (
+                  <Button onClick={handleFlip} className={styles.button}>
+                    View ticket
+                  </Button>
+                )}
+                <Button onClick={handleShareEvent} className={styles.button}>
+                  Share Event
+                </Button>
+              </HStack>
+            </VStack>
+            <VStack>
+              <Image src="/image.jpg" className={styles.eventImage} />
+            </VStack>
+          </HStack>
+        ) : (
+          <Text>Loading...</Text>
+        )
+      ) : (
+        <ReactCardFlip
+          isFlipped={isFlipped}
+          flipDirection="horizontal"
+          containerStyle={{ height: "100vh" }}
+        >
+          <VStack w="100%">
+            <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+            {/* The front of the card */}
+            {event ? (
+              <VStack className={styles.contentContainer} gap={1}>
+                <Image src="/image.jpg" />
+                <Text className={styles.eventHeaderMobile}>Event:</Text>
+                <Text className={styles.eventTitleMobile}>
+                  {event.eventName}
+                </Text>
+                <VStack alignItems="flex-start">
+                  <Text className={styles.eventDateMobile}>
+                    {format(new Date(event.date), "eeee, MMMM do")}
+                  </Text>
+                  <Text className={styles.eventTimeMobile}>
+                    {formattedTime}
+                  </Text>
+                </VStack>
+                <VStack alignItems="flex-start">
+                  <HStack>
+                    <FaSmile />
+                    <Text className={styles.eventHostMobile}>
+                      Hosted by{" "}
+                      <span>{event.hostName.toLocaleUpperCase()}</span>
+                    </Text>
+                  </HStack>
+                  <HStack>
+                    <FaMapMarkerAlt />
+                    <Text className={styles.eventLocationMobile}>
+                      {event.location.value.structured_formatting.main_text}
+                    </Text>
+                  </HStack>
+                </VStack>
+                <Text className={styles.eventDescMobile}>
+                  {event.description}
+                </Text>
+                <VStack alignItems="flex-start">
+                  <Text className={styles.eventDescMobile}>
+                    Tickets Remaining:{" "}
+                    {event.maxTickets - Object.keys(event.attendees).length}/
+                    {event.maxTickets}
+                  </Text>
+                  <Text className={styles.eventDescMobile}>
+                    Cost per Ticket: {event.costPerTicket}
+                  </Text>
+                </VStack>
+                <VStack w="100%" pt="10px">
+                  {!ticketId ? (
+                    <Button
+                      onClick={handleMintTicket}
+                      className={styles.button}
+                    >
+                      {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
+                    </Button>
+                  ) : (
+                    <Button onClick={handleFlip} className={styles.button}>
+                      View ticket
+                    </Button>
+                  )}
+                </VStack>
+              </VStack>
+            ) : (
+              <Text>Loading...</Text>
+            )}
+          </VStack>
+          <VStack>
+            {/* The back of the card */}
+            {ticketId && (
+              <>
+                <QRCode value={qrUrl} />
+                <Button onClick={handleFlip} className={styles.button}>
+                  Go back
+                </Button>
+              </>
+            )}
+          </VStack>
+        </ReactCardFlip>
+      )}
+      {isMobile && (
+        <HStack className={styles.navbar}>
+          <Text className={styles.poweredBy}>
+            Powered by <span className={styles.logo}>TIXO</span>
+          </Text>
+        </HStack>
+      )}
     </main>
   );
 }
+
+export default withTransition(EventPage);

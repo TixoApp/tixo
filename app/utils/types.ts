@@ -8,13 +8,13 @@ export type Event = {
   description: string;
   hostName: string;
   hostId: string;
-  location: string;
-  date: string;
-  time: string;
+  location: any;
+  date: number;
   maxTickets: number;
   costPerTicket: number;
   isTokenGated: boolean;
   attendees: Record<string, Attendee>;
   creationTxn: any;
   eventId: string;
+  bgImage: string;
 };

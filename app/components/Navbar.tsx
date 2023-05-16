@@ -4,12 +4,27 @@ import { HStack, Image } from "@chakra-ui/react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/router";
+import { useState, useEffect } from "react";
 
 const Navbar = () => {
   const { address } = useAccount();
   const { route } = useRouter();
+  const [width, setWidth] = useState<number>(window.innerWidth);
 
-  if (route === "/" && !address) return;
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowSizeChange);
+    return () => {
+      window.removeEventListener("resize", handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = width <= 500;
+
+  if ((route === "/" && !address) || isMobile) return;
 
   return (
     <HStack className={styles.navbar}>

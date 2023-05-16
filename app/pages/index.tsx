@@ -22,12 +22,18 @@ import { ImageContext } from "./_app";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SuccessLottie from "@components/SuccessLottie";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import withTransition from "@components/withTransition";
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 
-function ImageSelector() {
+function ImageSelector({ setBgImage }) {
   const images = ["/0.jpg", "/1.png", "/2.jpg", "/3.jpg"];
   const { setSelectedImage } = useContext(ImageContext);
+
+  function handleSelectImage(image) {
+    setBgImage(image);
+    setSelectedImage(image);
+  }
 
   return (
     <VStack className={styles.inputContainer}>
@@ -38,7 +44,7 @@ function ImageSelector() {
             key={image}
             src={image}
             alt=""
-            onClick={() => setSelectedImage(image)}
+            onClick={() => handleSelectImage(image)}
             style={{ cursor: "pointer" }}
             className={styles.imageSelection}
           />
@@ -61,11 +67,13 @@ function App() {
   const [costPerTicket, setCostPerTicket] = useState(0);
   const [isTokenGated, setIsTokenGated] = useState(false);
   const [tokenAddress, setTokenAddress] = useState("");
+  const [bgImage, setBgImage] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
   const [eventId, setEventId] = useState("");
   const [showIcon, setShowIcon] = useState(true);
   const [uploadedImage, setUploadedImage] = useState<Blob>();
+  const { setSelectedImage } = useContext(ImageContext);
 
   const scrollContainerRef = useRef(null);
 
@@ -103,20 +111,23 @@ function App() {
       // TODO: denominate in ETH
       const txnResult = await contract.createEvent(costPerTicket, maxTickets);
 
+      const eventDateTime = new Date(`${date}T${time}`);
+      const timestamp = Math.floor(eventDateTime.getTime() / 1000);
+
       const event: Event = {
         eventName,
         description,
         hostName,
         hostId: address,
         location,
-        date,
-        time,
+        date: timestamp,
         maxTickets,
         costPerTicket,
         isTokenGated,
         attendees: {},
         creationTxn: txnResult,
         eventId: String(lastEventIdBN.toNumber() + 1),
+        bgImage,
       };
 
       const response = await axios.post(
@@ -138,6 +149,10 @@ function App() {
     setUploadedImage(e.target.files[0]);
   }
 
+  useEffect(() => {
+    setSelectedImage("/0.jpg");
+  }, []);
+
   if (!address) return <Landing />;
 
   if (isSuccess)
@@ -151,8 +166,6 @@ function App() {
         </Link>
       </main>
     );
-
-  console.log("location: ", location);
 
   return (
     <main className={styles.main}>
@@ -191,11 +204,6 @@ function App() {
               </VStack>
               <VStack className={styles.inputContainer}>
                 <Text>Location</Text>
-                {/* <Input
-                  className={styles.input}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                ></Input> */}
                 <GooglePlacesAutocomplete
                   apiKey={process.env.NEXT_PUBLIC_GOOGLE_PLACES_KEY}
                   selectProps={{
@@ -339,7 +347,7 @@ function App() {
                 ></Image>
               </VStack>
             )}
-            <ImageSelector />
+            <ImageSelector setBgImage={setBgImage} />
           </VStack>
         </HStack>
         <Button onClick={createEvent} className={styles.button}>
@@ -350,4 +358,4 @@ function App() {
   );
 }
 
-export default App;
+export default withTransition(App);

@@ -182,3 +182,131 @@
   padding-left: 2px;
   padding-right: 2px;
 }
+
+.eventTitle {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 48px;
+}
+
+.eventDate {
+  font-family: "Plus Jakarta Sans";
+  font-style: normal;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.eventTime {
+  font-size: 20px;
+}
+
+.eventHost {
+  font-weight: 700;
+}
+
+.eventLocation {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.eventImage {
+  border-radius: 20px;
+}
+
+@media (max-width: 550px) {
+  .main {
+    padding-top: 0.5rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .contentContainer {
+    width: 100%;
+    padding: 3.5rem;
+    padding-top: 5rem;
+    z-index: 10;
+    align-items: flex-start !important;
+  }
+
+  .eventHeaderMobile {
+    font-family: "Plus Jakarta Sans";
+    font-style: italic;
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 16px;
+    padding-top: 10px;
+  }
+
+  .eventTitleMobile {
+    font-weight: 700;
+    font-size: 28px;
+    line-height: 28px;
+  }
+
+  .eventDateMobile {
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 14px;
+  }
+
+  .eventTimeMobile {
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 14px;
+  }
+
+  .eventHostMobile {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .eventLocationMobile {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .eventDescMobile {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+  }
+
+  .button {
+    width: 180px !important;
+    height: 42px !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 20px !important;
+  }
+
+  .navbar {
+    position: absolute;
+    justify-content: center;
+    width: 100%;
+    padding: 2rem;
+    height: 72px;
+    z-index: 1;
+    bottom: 20px;
+  }
+
+  .poweredBy {
+    font-family: "Plus Jakarta Sans";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 20px;
+  }
+
+  .logo {
+    font-family: "Bruno Ace";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
