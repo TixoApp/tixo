@@ -9,6 +9,13 @@ import {
   VStack,
   Image,
   Box,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerOverlay,
+  Input,
+  useDisclosure,
 } from "@chakra-ui/react";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
@@ -27,18 +34,19 @@ const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 const CID = "";
 
 function EventPage() {
+  const toast = useToast();
+  const router = useRouter();
+  const { id } = router.query;
   const { address } = useAccount();
   const { data: signer, isError } = useSigner();
   const [event, setEvent] = useState<Event | null>(null);
-  const router = useRouter();
-  const { id } = router.query;
   const [txnHash, setTxnHash] = useState<string>("");
   const [ticketId, setTicketId] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isFlipped, setIsFlipped] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
-  const toast = useToast();
   const { setSelectedImage } = useContext(ImageContext);
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   function handleWindowSizeChange() {
     setWidth(window.innerWidth);
@@ -54,6 +62,10 @@ function EventPage() {
   const isMobile = width <= 500;
 
   const handleFlip = () => setIsFlipped(!isFlipped);
+
+  const handleShowDrawer = () => {
+    onOpen();
+  };
 
   const handleMintTicket = useCallback(async () => {
     setLoading(true);
@@ -281,7 +293,7 @@ function EventPage() {
                 <VStack w="100%" pt="10px">
                   {!ticketId ? (
                     <Button
-                      onClick={handleMintTicket}
+                      onClick={handleShowDrawer}
                       className={styles.button}
                     >
                       {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
@@ -292,6 +304,42 @@ function EventPage() {
                     </Button>
                   )}
                 </VStack>
+                <Drawer
+                  placement="bottom"
+                  onClose={onClose}
+                  isOpen={isOpen}
+                  autoFocus={false}
+                >
+                  <DrawerOverlay />
+                  <DrawerContent bgColor="black" borderRadius="20px">
+                    <DrawerHeader borderBottomWidth="1px" border="none">
+                      <Text className={styles.drawerHeader}>
+                        Choose payment method
+                      </Text>
+                    </DrawerHeader>
+                    <DrawerBody>
+                      <VStack gap={5} pb="10px">
+                        <HStack className={styles.drawerButton}>
+                          <Image src="/tfuel.png" className={styles.tfuel} />
+                          <Text className={styles.buttonLabel}>
+                            Pay with TFUEL
+                          </Text>
+                        </HStack>
+                        <HStack className={styles.drawerButton}>
+                          <Image src="/visa.png" className={styles.visa} />
+                          <Text className={styles.buttonLabel}>
+                            Pay with card
+                          </Text>
+                        </HStack>
+                      </VStack>
+                      <VStack w="100%" p="1rem">
+                        <Text className={styles.poweredBy}>
+                          Powered by <span className={styles.logo}>TIXO</span>
+                        </Text>
+                      </VStack>
+                    </DrawerBody>
+                  </DrawerContent>
+                </Drawer>
               </VStack>
             ) : (
               <Text>Loading...</Text>

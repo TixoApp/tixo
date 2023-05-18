@@ -309,4 +309,46 @@
     font-size: 24px;
     line-height: 29px;
   }
+
+  .drawer {
+    background-color: black !important;
+    color: black !important;
+  }
+
+  .drawerButton {
+    width: 100%;
+    height: 80px;
+
+    background: rgba(255, 255, 255, 0.1);
+    border: 0.5px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+
+    justify-content: space-evenly;
+
+    padding-left: 2rem;
+    padding-right: 2rem;
+
+    transition: all 0.3 ease-in-out;
+  }
+
+  .drawerHeader {
+    width: 100%;
+    text-align: center;
+    padding-top: 1rem;
+    padding-bottom: 0.25rem;
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  .drawerButton:active {
+    transform: scale(0.95);
+  }
+
+  .tfuel {
+    width: 100px;
+  }
+
+  .visa {
+    width: 70px;
+  }
 }
