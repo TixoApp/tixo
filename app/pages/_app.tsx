@@ -1,6 +1,6 @@
 import "@styles/globals.css";
 import type { AppProps } from "next/app";
-import { useEffect, useState, useContext, createContext } from "react";
+import { useEffect, useState, createContext } from "react";
 import { ChakraProvider, extendTheme } from "@chakra-ui/react";
 import "@rainbow-me/rainbowkit/styles.css";
 import {
@@ -13,9 +13,11 @@ import {
 import { publicProvider } from "wagmi/providers/public";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
 import merge from "lodash.merge";
-import { goerli } from "wagmi/chains";
 import Head from "next/head";
 import Navbar from "@components/Navbar";
+
+export const TIXO_API_URL = process.env.NEXT_PUBLIC_TIXO_API_URL;
+export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
 
 const thetaTestnet: Chain = {
   id: 365,
@@ -36,7 +38,7 @@ const thetaTestnet: Chain = {
 };
 
 const { chains, provider } = configureChains(
-  [goerli, thetaTestnet], // TODO: switch this back
+  [thetaTestnet],
   [publicProvider()]
 );
 

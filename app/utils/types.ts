@@ -12,7 +12,7 @@ export type Event = {
   date: number;
   maxTickets: number;
   costPerTicket: number;
-  isTokenGated: boolean;
+  tokenAddress: string;
   attendees: Record<string, Attendee>;
   creationTxn: any;
   eventId: string;

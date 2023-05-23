@@ -2,7 +2,7 @@ require("@nomiclabs/hardhat-waffle");
 require("dotenv").config();
 
 module.exports = {
-  defaultNetwork: "goerli",
+  defaultNetwork: "theta_testnet",
   networks: {
     theta_privatenet: {
       url: "http://localhost:18888/rpc",

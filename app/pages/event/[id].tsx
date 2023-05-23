@@ -8,14 +8,25 @@ import {
   Text,
   VStack,
   Image,
-  Box,
   Drawer,
   DrawerBody,
   DrawerContent,
   DrawerHeader,
   DrawerOverlay,
-  Input,
   useDisclosure,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  TableContainer,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
 } from "@chakra-ui/react";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
@@ -27,11 +38,25 @@ import ReactCardFlip from "react-card-flip";
 import { format } from "date-fns";
 import { FaMapMarkerAlt, FaSmile } from "react-icons/fa";
 import { useToast } from "@chakra-ui/react";
-import { ImageContext } from "pages/_app";
+import { ImageContext, TIXO_API_URL, TIXO_CLIENT_URL } from "pages/_app";
 import withTransition from "@components/withTransition";
+import { loadStripe } from "@stripe/stripe-js";
+import { abridgeAddress } from "@utils/utils";
+import {
+  THETA_DROP_NFT_ABI,
+  requestAccounts,
+  getResponse,
+} from "@thetalabs/theta-pass";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
-const CID = "";
+
+const THETAZILLA_URL =
+  "https://thetazilla.thetadrop.com/content/type_2s2kcznsu3e06en43r3kg50b90c";
+
+const THETAZILLA_ADDRESS = "0x6e7e0c8a1109fdc68e5bca42d54740f333b3545d";
 
 function EventPage() {
   const toast = useToast();
@@ -46,7 +71,16 @@ function EventPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
   const { setSelectedImage } = useContext(ImageContext);
+  const [userAddress, setUserAddress] = useState();
+  const [isOwner, setIsOwner] = useState(false);
+  const { openConnectModal } = useConnectModal();
+
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isModalOpen,
+    onOpen: onModalOpen,
+    onClose: onModalClose,
+  } = useDisclosure();
 
   function handleWindowSizeChange() {
     setWidth(window.innerWidth);
@@ -59,15 +93,45 @@ function EventPage() {
     };
   }, []);
 
-  const isMobile = width <= 500;
+  const isMobile = useMemo(() => width <= 500, [width]);
+
+  const isHost = useMemo(() => {
+    if (!address) return false;
+    return (
+      event && event.hostId.toLocaleLowerCase() === address.toLocaleLowerCase()
+    );
+  }, [event, address]);
 
   const handleFlip = () => setIsFlipped(!isFlipped);
+
+  const handleStripeCheckout = async () => {
+    const success_url = `${TIXO_CLIENT_URL}${router.asPath}`;
+    const cancel_url = `${TIXO_CLIENT_URL}${router.asPath}`;
+
+    const response = await fetch(`${TIXO_API_URL}/create-checkout-session`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ success_url, cancel_url }),
+    });
+    const session = await response.json();
+    const stripe = await stripePromise;
+    const result = await stripe.redirectToCheckout({
+      sessionId: session.id,
+    });
+    if (result.error) {
+      console.log(result.error.message);
+    }
+  };
 
   const handleShowDrawer = () => {
     onOpen();
   };
 
   const handleMintTicket = useCallback(async () => {
+    if (!address) openConnectModal();
+
     setLoading(true);
     try {
       const contract = new ethers.Contract(
@@ -76,13 +140,13 @@ function EventPage() {
         signer
       );
 
-      const txn = await contract.mintWithTokenURI(address, id, CID);
+      const txn = await contract.mintWithTokenURI(address, id, "");
       const lastTicketId = await contract.getLastTicketId(id);
 
       const ticketId =
         parseInt(id as string) * 10 ** 5 + lastTicketId.toNumber() + 1;
 
-      const newAttendees = JSON.parse(JSON.stringify(event.attendees));
+      const newAttendees = JSON.parse(JSON.stringify(event.attendees ?? {}));
 
       newAttendees[address] = {
         ticketId,
@@ -95,7 +159,7 @@ function EventPage() {
       };
 
       const response = await axios.put(
-        `http://localhost:8888/updateEvent/${id}`,
+        `${TIXO_API_URL}/updateEvent/${id}`,
         updatedEvent
       );
 
@@ -108,15 +172,57 @@ function EventPage() {
     } finally {
       setLoading(false);
     }
-  }, [NFT_ADDRESS, address, signer]);
+  }, [NFT_ADDRESS, address, signer, event]);
+
+  const verifyOwnership = useCallback(
+    async (userAddress: string) => {
+      if (!userAddress) return;
+
+      const provider = new ethers.providers.JsonRpcProvider(
+        "https://eth-rpc-api.thetatoken.org/rpc"
+      );
+
+      const contract = new ethers.Contract(
+        THETAZILLA_ADDRESS,
+        THETA_DROP_NFT_ABI,
+        provider
+      );
+
+      const balance = await contract.balanceOf(userAddress);
+      const isOwner = balance.toNumber() > 0;
+
+      setIsOwner(isOwner);
+    },
+    [userAddress]
+  );
+
+  const finishViaRedirect = useCallback(async () => {
+    try {
+      const response = await getResponse();
+
+      if (response) {
+        const { result } = response;
+        const walletAddress = result[0];
+        verifyOwnership(walletAddress);
+      }
+    } catch (e) {}
+  }, [verifyOwnership]);
+
+  const requestAccountsViaRedirect = useCallback(async () => {
+    const redirectUrl = router ? `${TIXO_CLIENT_URL}${router.asPath}` : "";
+    await requestAccounts(redirectUrl, null, false);
+  }, [router]);
+
+  useEffect(() => {
+    finishViaRedirect();
+  }, [finishViaRedirect]);
 
   useEffect(() => {
     const fetchEvent = async () => {
       if (id) {
         try {
-          const res = await axios.get(`http://localhost:8888/event/id/${id}`);
+          const res = await axios.get(`${TIXO_API_URL}/event/id/${id}`);
           setEvent(res.data.event);
-          console.log(Object.keys(res.data.event.attendees));
           setTicketId(res.data.event.attendees[address].ticketId);
         } catch (err) {
           console.error(err);
@@ -128,38 +234,28 @@ function EventPage() {
   }, [id]);
 
   useEffect(() => {
-    if (event && event.bgImage) {
+    if (event && event.bgImage === "/3.jpg" && isMobile) {
       setSelectedImage("/3-mobile.png");
+    } else if (event && event.bgImage) {
+      setSelectedImage(event.bgImage);
     }
-  }, [event]);
+  }, [event, isMobile]);
 
-  const handleShareEvent = () => {
+  const handleShareEvent = async () => {
     const copyShareMessage = `Check out this event on TIXO: ${window.location.href}`;
 
-    navigator.clipboard
-      .writeText(copyShareMessage)
-      .then(() => {
-        toast({
-          title: "Success",
-          description: "Event URL copied to clipboard!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
-        toast({
-          title: "Error",
-          description: "Failed to copy URL",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      });
+    await navigator.clipboard.writeText(copyShareMessage);
+
+    toast({
+      title: "Success",
+      description: "Event URL copied to clipboard!",
+      status: "success",
+      duration: 5000,
+      isClosable: true,
+    });
   };
 
-  const qrUrl = `http://192.168.1.6:3000/validate?eventId=${id}&ticketId=${ticketId}&address=${address}`;
+  const qrUrl = `${TIXO_CLIENT_URL}/validate?eventId=${id}&ticketId=${ticketId}&address=${address}`;
 
   const formattedTime = useMemo(() => {
     if (!event) return "";
@@ -172,29 +268,65 @@ function EventPage() {
     });
   }, [event]);
 
-  console.log(qrUrl);
+  const isPrivateEvent = event && event.tokenAddress;
+  const needsVerification = isPrivateEvent && !isOwner;
 
   return (
     <main className={styles.main}>
+      <Modal onClose={onModalClose} isOpen={isModalOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent className={styles.modalContent}>
+          <ModalHeader className={styles.modalHeader}>
+            View Attendees
+          </ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <TableContainer>
+              <Table variant="simple">
+                <Thead>
+                  <Tr>
+                    <Th>Attendee</Th>
+                    <Th>Ticket No.</Th>
+                    <Th>Status</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {event &&
+                    Object.entries(event.attendees).map((a) => (
+                      <Tr>
+                        <Td>{abridgeAddress(a[0])}</Td>
+                        <Td>{a[1].ticketId}</Td>
+                        <Td>{a[1].status}</Td>
+                      </Tr>
+                    ))}
+                </Tbody>
+              </Table>
+            </TableContainer>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
       {!isMobile ? (
         event ? (
           <HStack>
             <VStack alignItems="flex-start" gap={3} maxWidth="500px">
-              <Text className={styles.eventTitle}>{event.eventName}</Text>
+              <Text className={styles.eventTitle}>
+                {event.eventName ? event.eventName : "Untitled Event"}
+              </Text>
               <VStack alignItems="flex-start">
                 <Text className={styles.eventDate}>
                   {format(new Date(event.date), "eeee, MMMM do")}
                 </Text>
                 <Text className={styles.eventTime}>{formattedTime}</Text>
               </VStack>
-
               <VStack alignItems="flex-start">
                 <HStack>
                   <FaSmile />
                   <Text>
                     Hosted by{" "}
                     <span className={styles.eventHost}>
-                      {event.hostName.toLocaleUpperCase()}
+                      {event.hostName
+                        ? event.hostName.toLocaleUpperCase()
+                        : "TBD"}
                     </span>
                   </Text>
                 </HStack>
@@ -202,7 +334,9 @@ function EventPage() {
                   <FaMapMarkerAlt />
                   <Text className={styles.eventLocation}>
                     {" "}
-                    {event.location.value.structured_formatting.main_text}
+                    {event.location
+                      ? event.location.value.structured_formatting.main_text
+                      : "TBD"}
                   </Text>
                 </HStack>
               </VStack>
@@ -215,15 +349,18 @@ function EventPage() {
                 </Text>
                 <Text>Cost per Ticket: {event.costPerTicket}</Text>
               </VStack>
-              {/* <Text>Is Token Gated: {event.isTokenGated ? "Yes" : "No"}</Text> */}
               <HStack gap={1}>
                 {!ticketId ? (
                   <Button onClick={handleMintTicket} className={styles.button}>
                     {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
                   </Button>
-                ) : (
+                ) : !isHost ? (
                   <Button onClick={handleFlip} className={styles.button}>
                     View ticket
+                  </Button>
+                ) : (
+                  <Button onClick={onModalOpen} className={styles.button}>
+                    View dashboard
                   </Button>
                 )}
                 <Button onClick={handleShareEvent} className={styles.button}>
@@ -242,17 +379,161 @@ function EventPage() {
         <ReactCardFlip
           isFlipped={isFlipped}
           flipDirection="horizontal"
-          containerStyle={{ height: "100vh" }}
+          containerStyle={{ height: "95vh" }}
         >
-          <VStack w="100%">
-            <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+          <VStack w="100%" p="1rem" pt=".5rem">
+            <Image src="/ticket.png" position="absolute" h="90vh" w="85vw" />
             {/* The front of the card */}
             {event ? (
               <VStack className={styles.contentContainer} gap={1}>
-                <Image src="/image.jpg" />
-                <Text className={styles.eventHeaderMobile}>Event:</Text>
+                <VStack w="100%" justifyContent="center">
+                  <Image src="/image.jpg" w="240px" />
+                </VStack>
+                <Text className={styles.eventHeaderMobile}>EVENT:</Text>
                 <Text className={styles.eventTitleMobile}>
                   {event.eventName}
+                </Text>
+                <VStack
+                  className={needsVerification ? styles.isPrivate : ""}
+                  w="100%"
+                  alignItems="flex-start"
+                >
+                  {ticketId && (
+                    <Text className={styles.eventTicketNo}>
+                      TICKET NO. {ticketId}
+                    </Text>
+                  )}
+                  <VStack alignItems="flex-start" pb="8px">
+                    <Text className={styles.eventDateMobile}>
+                      {format(new Date(event.date), "eeee, MMMM do")}
+                    </Text>
+                    <Text className={styles.eventTimeMobile}>
+                      {formattedTime}
+                    </Text>
+                  </VStack>
+                  <VStack alignItems="flex-start" pb="8px">
+                    <HStack>
+                      <FaSmile />
+                      <Text className={styles.eventHostMobile}>
+                        Hosted by{" "}
+                        <span>{event.hostName.toLocaleUpperCase()}</span>
+                      </Text>
+                    </HStack>
+                    <HStack>
+                      <FaMapMarkerAlt />
+                      <Text className={styles.eventLocationMobile}>
+                        {event.location
+                          ? event.location.value.structured_formatting.main_text
+                          : "TBD"}
+                      </Text>
+                    </HStack>
+                  </VStack>
+                  <Text className={styles.eventDescMobile}>
+                    {event.description}
+                  </Text>
+                  {!ticketId ? (
+                    <VStack alignItems="flex-start" pb="8px">
+                      <Text className={styles.eventDescMobile}>
+                        Tickets Remaining:{" "}
+                        {event.maxTickets - Object.keys(event.attendees).length}
+                        /{event.maxTickets}
+                      </Text>
+                      <Text className={styles.eventDescMobile}>
+                        Cost per Ticket: {event.costPerTicket}
+                      </Text>
+                    </VStack>
+                  ) : (
+                    <VStack h="10px" />
+                  )}
+                </VStack>
+                <VStack w="100%">
+                  {event && event.tokenAddress && !isOwner ? (
+                    <Button
+                      onClick={requestAccountsViaRedirect}
+                      className={styles.button}
+                    >
+                      Verify Access
+                    </Button>
+                  ) : !ticketId ? (
+                    <Button
+                      onClick={handleShowDrawer}
+                      className={styles.button}
+                    >
+                      {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
+                    </Button>
+                  ) : (
+                    <Button onClick={handleFlip} className={styles.button}>
+                      View ticket
+                    </Button>
+                  )}
+                  {needsVerification && (
+                    <Text className={styles.privateLabel}>
+                      This is a private event. Please connect your wallet to
+                      verify access.
+                    </Text>
+                  )}
+                </VStack>
+                <Drawer
+                  placement="bottom"
+                  onClose={onClose}
+                  isOpen={isOpen}
+                  autoFocus={false}
+                >
+                  <DrawerOverlay />
+                  <DrawerContent bgColor="black" borderRadius="20px">
+                    <DrawerHeader borderBottomWidth="1px" border="none">
+                      <Text className={styles.drawerHeader}>
+                        Choose payment method
+                      </Text>
+                    </DrawerHeader>
+                    <DrawerBody>
+                      <VStack gap={5} pb="10px">
+                        <HStack
+                          className={styles.drawerButton}
+                          onClick={handleMintTicket}
+                        >
+                          <Image src="/tfuel.png" className={styles.tfuel} />
+                          <Text className={styles.buttonLabel}>
+                            Pay with TFUEL
+                          </Text>
+                        </HStack>
+                        <HStack
+                          className={styles.drawerButton}
+                          onClick={handleStripeCheckout}
+                        >
+                          <Image src="/visa.png" className={styles.visa} />
+                          <Text className={styles.buttonLabel}>
+                            Pay with card
+                          </Text>
+                        </HStack>
+                      </VStack>
+                      <VStack w="100%" p="1rem">
+                        <Text className={styles.poweredBy}>
+                          Powered by <span className={styles.logo}>TIXO</span>
+                        </Text>
+                      </VStack>
+                    </DrawerBody>
+                  </DrawerContent>
+                </Drawer>
+              </VStack>
+            ) : (
+              <VStack className={styles.loadingContainer} gap={1}>
+                <Spinner color="white" />
+              </VStack>
+            )}
+          </VStack>
+          <VStack w="100%">
+            <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+            {/* The back of the card */}
+            {event ? (
+              <VStack className={styles.contentContainer} gap={1}>
+                <QRCode value={qrUrl} size={246} />
+                <Text className={styles.eventHeaderMobile}>EVENT:</Text>
+                <Text className={styles.eventTitleMobile}>
+                  {event.eventName}
+                </Text>
+                <Text className={styles.eventTicketNo}>
+                  TICKET NO. {ticketId}
                 </Text>
                 <VStack alignItems="flex-start">
                   <Text className={styles.eventDateMobile}>
@@ -273,87 +554,24 @@ function EventPage() {
                   <HStack>
                     <FaMapMarkerAlt />
                     <Text className={styles.eventLocationMobile}>
-                      {event.location.value.structured_formatting.main_text}
+                      {event.location
+                        ? event.location.value.structured_formatting.main_text
+                        : "TBD"}
                     </Text>
                   </HStack>
                 </VStack>
                 <Text className={styles.eventDescMobile}>
                   {event.description}
                 </Text>
-                <VStack alignItems="flex-start">
-                  <Text className={styles.eventDescMobile}>
-                    Tickets Remaining:{" "}
-                    {event.maxTickets - Object.keys(event.attendees).length}/
-                    {event.maxTickets}
-                  </Text>
-                  <Text className={styles.eventDescMobile}>
-                    Cost per Ticket: {event.costPerTicket}
-                  </Text>
-                </VStack>
+                <VStack h="10px" />
                 <VStack w="100%" pt="10px">
-                  {!ticketId ? (
-                    <Button
-                      onClick={handleShowDrawer}
-                      className={styles.button}
-                    >
-                      {isLoading ? <Spinner color="black" /> : "Buy Ticket"}
-                    </Button>
-                  ) : (
-                    <Button onClick={handleFlip} className={styles.button}>
-                      View ticket
-                    </Button>
-                  )}
+                  <Button onClick={handleFlip} className={styles.button}>
+                    Go back
+                  </Button>
                 </VStack>
-                <Drawer
-                  placement="bottom"
-                  onClose={onClose}
-                  isOpen={isOpen}
-                  autoFocus={false}
-                >
-                  <DrawerOverlay />
-                  <DrawerContent bgColor="black" borderRadius="20px">
-                    <DrawerHeader borderBottomWidth="1px" border="none">
-                      <Text className={styles.drawerHeader}>
-                        Choose payment method
-                      </Text>
-                    </DrawerHeader>
-                    <DrawerBody>
-                      <VStack gap={5} pb="10px">
-                        <HStack className={styles.drawerButton}>
-                          <Image src="/tfuel.png" className={styles.tfuel} />
-                          <Text className={styles.buttonLabel}>
-                            Pay with TFUEL
-                          </Text>
-                        </HStack>
-                        <HStack className={styles.drawerButton}>
-                          <Image src="/visa.png" className={styles.visa} />
-                          <Text className={styles.buttonLabel}>
-                            Pay with card
-                          </Text>
-                        </HStack>
-                      </VStack>
-                      <VStack w="100%" p="1rem">
-                        <Text className={styles.poweredBy}>
-                          Powered by <span className={styles.logo}>TIXO</span>
-                        </Text>
-                      </VStack>
-                    </DrawerBody>
-                  </DrawerContent>
-                </Drawer>
               </VStack>
             ) : (
               <Text>Loading...</Text>
-            )}
-          </VStack>
-          <VStack>
-            {/* The back of the card */}
-            {ticketId && (
-              <>
-                <QRCode value={qrUrl} />
-                <Button onClick={handleFlip} className={styles.button}>
-                  Go back
-                </Button>
-              </>
             )}
           </VStack>
         </ReactCardFlip>

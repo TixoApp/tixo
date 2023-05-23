@@ -11,6 +11,9 @@ import {
   Spinner,
   HStack,
   Image,
+  InputGroup,
+  InputLeftElement,
+  InputRightElement,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Link from "next/link";
@@ -18,7 +21,7 @@ import { Event } from "@utils/types";
 import { ethers } from "ethers";
 import TixoCollectionV1 from "@data/TixoCollectionV1.json";
 import Landing from "@components/Landing";
-import { ImageContext } from "./_app";
+import { ImageContext, TIXO_API_URL } from "./_app";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SuccessLottie from "@components/SuccessLottie";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
@@ -28,6 +31,13 @@ const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 
 function ImageSelector({ setBgImage }) {
   const images = ["/0.jpg", "/1.png", "/2.jpg", "/3.jpg"];
+  const [uploadedBg, setUploadedBg] = useState<Blob>();
+
+  function handleImageBg(e) {
+    setUploadedBg(e.target.files[0]);
+    setSelectedImage(URL.createObjectURL(e.target.files[0]));
+  }
+
   const { setSelectedImage } = useContext(ImageContext);
 
   function handleSelectImage(image) {
@@ -38,7 +48,40 @@ function ImageSelector({ setBgImage }) {
   return (
     <VStack className={styles.inputContainer}>
       <Text>Select background</Text>
-      <HStack>
+      <HStack className={styles.bgContainer}>
+        {!uploadedBg ? (
+          <VStack className={styles.bgUploadContainer}>
+            <input
+              type="file"
+              name="images"
+              id="images"
+              required
+              multiple
+              onChange={handleImageBg}
+              className={styles.bgInput}
+            />
+            <VStack className={styles.bgInputText}>
+              <Text fontSize="24px">+</Text>
+            </VStack>
+          </VStack>
+        ) : (
+          <VStack className={styles.bgUploadContainer}>
+            <input
+              type="file"
+              name="images"
+              id="images"
+              required
+              multiple
+              onChange={handleImageBg}
+              className={styles.bgInput}
+            />
+            <Image
+              alt="preview"
+              src={uploadedBg ? URL.createObjectURL(uploadedBg) : ""}
+              className={styles.bgPreviewContainer}
+            ></Image>
+          </VStack>
+        )}
         {images.map((image) => (
           <img
             key={image}
@@ -108,8 +151,7 @@ function App() {
 
       const lastEventIdBN = await contract.getLastEventId();
 
-      // TODO: denominate in ETH
-      const txnResult = await contract.createEvent(costPerTicket, maxTickets);
+      const txnResult = await contract.createEvent(0, maxTickets);
 
       const eventDateTime = new Date(`${date}T${time}`);
       const timestamp = Math.floor(eventDateTime.getTime() / 1000);
@@ -123,19 +165,15 @@ function App() {
         date: timestamp,
         maxTickets,
         costPerTicket,
-        isTokenGated,
+        tokenAddress,
         attendees: {},
         creationTxn: txnResult,
         eventId: String(lastEventIdBN.toNumber() + 1),
         bgImage,
       };
 
-      const response = await axios.post(
-        "http://localhost:8888/createEvent",
-        event
-      );
+      const response = await axios.post(`${TIXO_API_URL}/createEvent`, event);
 
-      console.log(response.data);
       setEventId(response.data.eventId);
       setSuccess(true);
     } catch (err) {
@@ -269,11 +307,33 @@ function App() {
               </VStack>
               <VStack className={styles.inputContainer}>
                 <Text>Cost per ticket</Text>
-                <Input
-                  className={styles.input}
-                  value={costPerTicket}
-                  onChange={(e) => setCostPerTicket(Number(e.target.value))}
-                ></Input>
+                {/* <VStack position="relative"> */}
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    color="gray.300"
+                    fontSize="1.2em"
+                    children="$"
+                  />
+                  <Input
+                    className={styles.input}
+                    value={costPerTicket}
+                    onChange={(e) => setCostPerTicket(Number(e.target.value))}
+                  ></Input>
+                  {/* <Text
+                    position="absolute"
+                    color="rgba(255,255,255,0.5)"
+                    right="20px"
+                  >
+                    {costPerTicket * 0.04} TFUEL
+                  </Text> */}
+                  <InputRightElement w="200px" justifyContent="flex-end">
+                    <Text color="rgba(255,255,255,0.5)" pr="20px">
+                      {costPerTicket * 0.04} TFUEL
+                    </Text>
+                  </InputRightElement>
+                  {/* </VStack> */}
+                </InputGroup>
               </VStack>
               {isTokenGated && (
                 <VStack className={styles.inputContainer}>
@@ -330,21 +390,26 @@ function App() {
                 </VStack>
               </VStack>
             ) : (
-              <VStack className={styles.imageUploadContainer}>
-                <input
-                  type="file"
-                  name="images"
-                  id="images"
-                  required
-                  multiple
-                  onChange={handleImageUpload}
-                  className={styles.imageInput}
-                />
-                <Image
-                  alt="preview"
-                  src={uploadedImage ? URL.createObjectURL(uploadedImage) : ""}
-                  className={styles.previewContainer}
-                ></Image>
+              <VStack className={styles.inputContainer}>
+                <Text>Image</Text>
+                <VStack className={styles.imageUploadContainer}>
+                  <input
+                    type="file"
+                    name="images"
+                    id="images"
+                    required
+                    multiple
+                    onChange={handleImageUpload}
+                    className={styles.imageInput}
+                  />
+                  <Image
+                    alt="preview"
+                    src={
+                      uploadedImage ? URL.createObjectURL(uploadedImage) : ""
+                    }
+                    className={styles.previewContainer}
+                  ></Image>
+                </VStack>
               </VStack>
             )}
             <ImageSelector setBgImage={setBgImage} />

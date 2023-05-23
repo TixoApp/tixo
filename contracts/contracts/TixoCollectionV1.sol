@@ -30,7 +30,7 @@ contract TixoCollectionV1 is ERC721URIStorage, Ownable {
     );
     event CollectionURIUpdated(string newURI);
 
-    constructor() ERC721("Tixo Ticket", "TIXO") {}
+    constructor() ERC721("Tixo Protocol v1", "TIXO") {}
 
     function createEvent(
         uint256 ticketPrice,

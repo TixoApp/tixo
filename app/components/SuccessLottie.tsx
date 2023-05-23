@@ -1,7 +1,12 @@
 import React from "react";
 import Lottie from "react-lottie";
 
-const SuccessLottie = () => {
+type SuccessLottieProps = {
+  h?: number;
+  w?: number;
+};
+
+const SuccessLottie = ({ h, w }: SuccessLottieProps) => {
   const defaultOptions = {
     loop: false,
     autoplay: true,
@@ -12,7 +17,12 @@ const SuccessLottie = () => {
   };
 
   return (
-    <Lottie options={defaultOptions} speed={0.7} height={400} width={400} />
+    <Lottie
+      options={defaultOptions}
+      speed={0.7}
+      height={h ?? 400}
+      width={w ?? 300}
+    />
   );
 };
 

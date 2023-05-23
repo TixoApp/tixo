@@ -1,28 +1,49 @@
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
-import { Box, Spinner, Text } from "@chakra-ui/react";
+import { Box, Spinner, Text, Image, VStack, HStack } from "@chakra-ui/react";
+import styles from "@styles/Home.module.css";
+import SuccessLottie from "@components/SuccessLottie";
+import FailureLottie from "@components/FailureLottie";
+import { Event } from "@utils/types";
+import { TIXO_API_URL } from "./_app";
 
 export default function ValidateTicket() {
   const router = useRouter();
   const [validationStatus, setValidationStatus] = useState(
     "Validating ticket..."
   );
+  const { eventId, ticketId, address } = router.query;
+  const [event, setEvent] = useState<Event | null>(null);
+
+  const isTicketValid = useMemo(() => {
+    if (event) return event.attendees[address as string].status === "unused";
+  }, [event, address]);
+
+  useEffect(() => {
+    const fetchEvent = async () => {
+      if (eventId) {
+        try {
+          const res = await axios.get(`${TIXO_API_URL}/event/id/${eventId}`);
+          setEvent(res.data.event);
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+
+    fetchEvent();
+  }, [eventId]);
 
   useEffect(() => {
     const validateTicket = async () => {
-      const { eventId, ticketId, address } = router.query;
-
       if (eventId && ticketId && address) {
         try {
-          const response = await axios.post(
-            "http://localhost:8888/validateTicket",
-            {
-              eventId: eventId as string,
-              ticketId: ticketId as string,
-              address: address as string,
-            }
-          );
+          const response = await axios.post(`${TIXO_API_URL}/validateTicket`, {
+            eventId: eventId as string,
+            ticketId: ticketId as string,
+            address: address as string,
+          });
 
           if (response.data.message === "Ticket validated successfully") {
             setValidationStatus("Ticket validated.");
@@ -40,9 +61,45 @@ export default function ValidateTicket() {
   }, [router.query]);
 
   return (
-    <Box padding="6" boxShadow="lg" bg="white">
-      {validationStatus === "Validating ticket..." ? <Spinner /> : null}
-      <Text>{validationStatus}</Text>
-    </Box>
+    <VStack w="100%">
+      <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+      <VStack className={styles.verifiedContentContainer} gap={1}>
+        {!event ? (
+          <VStack>
+            {validationStatus === "Validating ticket..." ? <Spinner /> : null}
+            <Text>{validationStatus}</Text>
+          </VStack>
+        ) : (
+          <VStack w="100%">
+            <Text textAlign="center" w="100%">
+              {isTicketValid ? "TICKET VERIFIED" : "INVALID TICKET"}
+            </Text>
+            <VStack w="100%">
+              {isTicketValid ? (
+                <SuccessLottie h={270} w={270} />
+              ) : (
+                <FailureLottie h={270} w={270} />
+              )}
+            </VStack>
+            <VStack alignItems="flex-start">
+              <Text className={styles.eventHeaderMobile}>EVENT:</Text>
+              <Text className={styles.eventTitleMobile}>{event.eventName}</Text>
+              <Text className={styles.eventTicketNo}>
+                TICKET NO. {ticketId}
+              </Text>
+              <Text className={styles.eventDescMobile}>
+                This ticket has previously been marked as "used". It is no
+                longer a valid ticket for event entry.
+              </Text>
+            </VStack>
+          </VStack>
+        )}
+      </VStack>
+      <HStack className={styles.navbar} bottom={1}>
+        <Text className={styles.poweredBy}>
+          Powered by <span className={styles.logo}>TIXO</span>
+        </Text>
+      </HStack>
+    </VStack>
   );
 }

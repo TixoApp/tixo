@@ -4,6 +4,7 @@ import { useAccount } from "wagmi";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
 import Link from "next/link";
+import { TIXO_API_URL } from "./_app";
 
 export default function Profile() {
   const { address } = useAccount();
@@ -14,7 +15,7 @@ export default function Profile() {
       if (address) {
         try {
           const res = await axios.get(
-            `http://localhost:8888/event/address/${address}`
+            `${TIXO_API_URL}/event/address/${address}`
           );
           setEvents(res.data.events);
         } catch (err) {

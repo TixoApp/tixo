@@ -14,7 +14,7 @@ async function main() {
 
     console.log("Creating event...");
 
-    const txn = await tixo.createEvent(0);
+    const txn = await tixo.createEvent(0, 100);
     await txn.wait();
     console.log("event created ", txn);
   } catch (err) {
