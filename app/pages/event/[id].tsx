@@ -30,7 +30,7 @@ import {
 } from "@chakra-ui/react";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
-import { useAccount, useSigner } from "wagmi";
+import { useAccount, useDisconnect, useSigner } from "wagmi";
 import { ethers } from "ethers";
 import TixoCollectionV1 from "@data/TixoCollectionV1.json";
 import QRCode from "react-qr-code";
@@ -48,6 +48,7 @@ import {
   getResponse,
 } from "@thetalabs/theta-pass";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
+import SuccessLottie from "@components/SuccessLottie";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
@@ -71,9 +72,10 @@ function EventPage() {
   const [isFlipped, setIsFlipped] = useState(false);
   const [width, setWidth] = useState<number>(window.innerWidth);
   const { setSelectedImage } = useContext(ImageContext);
-  const [userAddress, setUserAddress] = useState();
   const [isOwner, setIsOwner] = useState(false);
+  const [count, setCount] = useState(0);
   const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect();
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -164,8 +166,10 @@ function EventPage() {
       );
 
       console.log(response.data);
-
       setEvent(updatedEvent);
+
+      await txn.wait();
+
       setTxnHash(txn.hash);
     } catch (e) {
       console.log(e);
@@ -174,27 +178,24 @@ function EventPage() {
     }
   }, [NFT_ADDRESS, address, signer, event]);
 
-  const verifyOwnership = useCallback(
-    async (userAddress: string) => {
-      if (!userAddress) return;
+  const verifyOwnership = useCallback(async (userAddress: string) => {
+    if (!userAddress) return;
 
-      const provider = new ethers.providers.JsonRpcProvider(
-        "https://eth-rpc-api.thetatoken.org/rpc"
-      );
+    const provider = new ethers.providers.JsonRpcProvider(
+      "https://eth-rpc-api.thetatoken.org/rpc"
+    );
 
-      const contract = new ethers.Contract(
-        THETAZILLA_ADDRESS,
-        THETA_DROP_NFT_ABI,
-        provider
-      );
+    const contract = new ethers.Contract(
+      THETAZILLA_ADDRESS,
+      THETA_DROP_NFT_ABI,
+      provider
+    );
 
-      const balance = await contract.balanceOf(userAddress);
-      const isOwner = balance.toNumber() > 0;
+    const balance = await contract.balanceOf(userAddress);
+    const isOwner = balance.toNumber() > 0;
 
-      setIsOwner(isOwner);
-    },
-    [userAddress]
-  );
+    setIsOwner(isOwner);
+  }, []);
 
   const finishViaRedirect = useCallback(async () => {
     try {
@@ -270,6 +271,13 @@ function EventPage() {
 
   const isPrivateEvent = event && event.tokenAddress;
   const needsVerification = isPrivateEvent && !isOwner;
+
+  const handleHiddenDisconnect = () => {
+    if (count > 2) disconnect?.();
+    else {
+      setCount((prev) => prev + 1);
+    }
+  };
 
   return (
     <main className={styles.main}>
@@ -405,7 +413,10 @@ function EventPage() {
                   )}
                   <VStack alignItems="flex-start" pb="8px">
                     <Text className={styles.eventDateMobile}>
-                      {format(new Date(event.date), "eeee, MMMM do")}
+                      {format(
+                        new Date(event.date ? event.date : "2023-06-04"),
+                        "eeee, MMMM do"
+                      )}
                     </Text>
                     <Text className={styles.eventTimeMobile}>
                       {formattedTime}
@@ -480,40 +491,97 @@ function EventPage() {
                   autoFocus={false}
                 >
                   <DrawerOverlay />
-                  <DrawerContent bgColor="black" borderRadius="20px">
-                    <DrawerHeader borderBottomWidth="1px" border="none">
-                      <Text className={styles.drawerHeader}>
-                        Choose payment method
-                      </Text>
-                    </DrawerHeader>
-                    <DrawerBody>
-                      <VStack gap={5} pb="10px">
-                        <HStack
-                          className={styles.drawerButton}
-                          onClick={handleMintTicket}
-                        >
-                          <Image src="/tfuel.png" className={styles.tfuel} />
-                          <Text className={styles.buttonLabel}>
-                            Pay with TFUEL
-                          </Text>
-                        </HStack>
-                        <HStack
-                          className={styles.drawerButton}
-                          onClick={handleStripeCheckout}
-                        >
-                          <Image src="/visa.png" className={styles.visa} />
-                          <Text className={styles.buttonLabel}>
-                            Pay with card
-                          </Text>
-                        </HStack>
-                      </VStack>
-                      <VStack w="100%" p="1rem">
-                        <Text className={styles.poweredBy}>
-                          Powered by <span className={styles.logo}>TIXO</span>
+                  {txnHash ? (
+                    <DrawerContent bgColor="black" borderRadius="20px">
+                      <DrawerHeader borderBottomWidth="1px" border="none">
+                        <Text className={styles.drawerHeader}>
+                          Payment Status
                         </Text>
-                      </VStack>
-                    </DrawerBody>
-                  </DrawerContent>
+                      </DrawerHeader>
+                      <DrawerBody>
+                        <VStack gap={5} pb="10px">
+                          <VStack className={styles.spinnerContainer}>
+                            <SuccessLottie w={150} h={150} />
+                            <Text fontSize="14px" pt="1rem">
+                              Payment successful
+                            </Text>
+                          </VStack>
+                        </VStack>
+                        <VStack w="100%" p="1rem">
+                          <Text
+                            className={styles.poweredBy}
+                            onClick={handleHiddenDisconnect}
+                          >
+                            Powered by <span className={styles.logo}>TIXO</span>
+                          </Text>
+                        </VStack>
+                      </DrawerBody>
+                    </DrawerContent>
+                  ) : isLoading ? (
+                    <DrawerContent bgColor="black" borderRadius="20px">
+                      <DrawerHeader borderBottomWidth="1px" border="none">
+                        <Text className={styles.drawerHeader}>
+                          Payment Status
+                        </Text>
+                      </DrawerHeader>
+                      <DrawerBody>
+                        <VStack gap={5} pb="10px">
+                          <VStack className={styles.spinnerContainer}>
+                            <Spinner color="white" size="xl" />
+                            <Text fontSize="14px" pt="1rem">
+                              Payment processing...
+                            </Text>
+                          </VStack>
+                        </VStack>
+                        <VStack w="100%" p="1rem">
+                          <Text
+                            className={styles.poweredBy}
+                            onClick={handleHiddenDisconnect}
+                          >
+                            Powered by <span className={styles.logo}>TIXO</span>
+                          </Text>
+                        </VStack>
+                      </DrawerBody>
+                    </DrawerContent>
+                  ) : (
+                    <DrawerContent bgColor="black" borderRadius="20px">
+                      <DrawerHeader borderBottomWidth="1px" border="none">
+                        <Text className={styles.drawerHeader}>
+                          Choose payment method
+                        </Text>
+                      </DrawerHeader>
+                      <DrawerBody>
+                        <VStack gap={5} pb="10px">
+                          <HStack
+                            className={styles.drawerButton}
+                            onClick={handleMintTicket}
+                          >
+                            <Image src="/tfuel.png" className={styles.tfuel} />
+                            <Text className={styles.buttonLabel}>
+                              Pay with TFUEL
+                            </Text>
+                          </HStack>
+                          <HStack
+                            className={styles.drawerButton}
+                            onClick={handleStripeCheckout}
+                          >
+                            <Image src="/visa.png" className={styles.visa} />
+                            <Text className={styles.buttonLabel}>
+                              Pay with card
+                            </Text>
+                          </HStack>
+                        </VStack>
+                        <VStack w="100%" p="1rem">
+                          <Text
+                            className={styles.poweredBy}
+                            onClick={handleHiddenDisconnect}
+                          >
+                            Powered by <span className={styles.logo}>TIXO</span>
+                          </Text>
+                        </VStack>
+                      </DrawerBody>
+                    </DrawerContent>
+                  )}
                 </Drawer>
               </VStack>
             ) : (
@@ -522,12 +590,14 @@ function EventPage() {
               </VStack>
             )}
           </VStack>
-          <VStack w="100%">
-            <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+          <VStack w="100%" p="1rem" pt=".5rem">
+            <Image src="/ticket.png" position="absolute" h="90vh" w="85vw" />
             {/* The back of the card */}
             {event ? (
               <VStack className={styles.contentContainer} gap={1}>
-                <QRCode value={qrUrl} size={246} />
+                <VStack w="100%" justifyContent="center">
+                  <QRCode value={qrUrl} size={240} />
+                </VStack>
                 <Text className={styles.eventHeaderMobile}>EVENT:</Text>
                 <Text className={styles.eventTitleMobile}>
                   {event.eventName}
@@ -537,7 +607,10 @@ function EventPage() {
                 </Text>
                 <VStack alignItems="flex-start">
                   <Text className={styles.eventDateMobile}>
-                    {format(new Date(event.date), "eeee, MMMM do")}
+                    {format(
+                      new Date(event.date ? event.date : "2023-06-04"),
+                      "eeee, MMMM do"
+                    )}
                   </Text>
                   <Text className={styles.eventTimeMobile}>
                     {formattedTime}

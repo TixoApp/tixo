@@ -61,8 +61,8 @@ export default function ValidateTicket() {
   }, [router.query]);
 
   return (
-    <VStack w="100%">
-      <Image w="100%" src="/ticket.png" position="absolute" h="95vh" />
+    <VStack w="100%" p="1rem">
+      <Image src="/ticket.png" position="absolute" h="85vh" w="85vw" />
       <VStack className={styles.verifiedContentContainer} gap={1}>
         {!event ? (
           <VStack>
@@ -70,15 +70,15 @@ export default function ValidateTicket() {
             <Text>{validationStatus}</Text>
           </VStack>
         ) : (
-          <VStack w="100%">
+          <VStack w="100%" alignItems="center">
             <Text textAlign="center" w="100%">
               {isTicketValid ? "TICKET VERIFIED" : "INVALID TICKET"}
             </Text>
-            <VStack w="100%">
+            <VStack w="100%" alignItems="center">
               {isTicketValid ? (
-                <SuccessLottie h={270} w={270} />
+                <SuccessLottie h={240} w={240} />
               ) : (
-                <FailureLottie h={270} w={270} />
+                <FailureLottie h={240} w={240} />
               )}
             </VStack>
             <VStack alignItems="flex-start">
@@ -87,7 +87,7 @@ export default function ValidateTicket() {
               <Text className={styles.eventTicketNo}>
                 TICKET NO. {ticketId}
               </Text>
-              <Text className={styles.eventDescMobile}>
+              <Text fontSize="14px" lineHeight="20px">
                 This ticket has previously been marked as "used". It is no
                 longer a valid ticket for event entry.
               </Text>
