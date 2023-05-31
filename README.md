@@ -1,6 +1,6 @@
-# TIXO: Next-Generation Ticketing on Theta Network
+# TIXO: Next-Generation Ticketing on Polygon
 
-This project was built specifically for the Theta 2023 Hackathon.
+This project was built specifically for the Polygon DevX Hackathon.
 
 View the full demo walkthrough here: https://vimeo.com/832694198
 
@@ -24,10 +24,10 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 ## Features on TIXO today
 
 - Event ticketing creation tool for hosts
-- Token-gated private event ticketing via ThetaPass
+- Token-gated private event ticketing
 - UI Customized for ticketing pages
 - Mobile-first ticket purchase flow with multi-payments
-- Payment integration with TFUEL and Stripe API
+- Payment integration with MATIC and Stripe API
 - QR code powered ticket verification process
 - Event monitoring dashboard for tracking purchases
 - Custodial and non-custodial ticket vault solutions
@@ -39,15 +39,15 @@ In a rapidly growing online ticketing economy projected to reach $68 billion by 
 TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
 
 ## How we built it
-The base app is a standard NextJS application with a Node server. Our smart contracts were written in Solidity using the Hardhat Ethereum development environment to deploy to Theta Testnet for the demo. For token-gated access control, we utilized the ThetaPass SDK. Finally, we used TFUEL and the Stripe API for payment rails on the v1 prototype application.
+The base app is a standard NextJS application with a Node server. Our smart contracts were written in Solidity using the Hardhat Ethereum development environment to deploy to Polygon Mumbai for the demo. We used MATIC and the Stripe API for payment rails on the v1 prototype application.
 
 ## What's next for TIXO
 
-We want to build the next-generation event ticketing platform powered by Theta Network. Some next step features we want to integrate into our application are the following:
+We want to build the next-generation event ticketing platform powered by Polygon Network. Some next step features we want to integrate into our application are the following:
 - Build React-Native mobile app for v2 prototype
 - Tiered ticket sales (i.e. VIP, General Admissions)
 - Seating selection for large venue events
-- Add TNT-20 payment method for token communities on Theta
+- Add ERC-20 payment method for token communities on Polygon
 - Add advanced metrics for host event dashboard
 - Marketing and partnerships to beta test platform launch
 - Export custodial ticket accounts via private key export

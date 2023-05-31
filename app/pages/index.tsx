@@ -27,6 +27,7 @@ import { ChevronDownIcon } from "@chakra-ui/icons";
 import SuccessLottie from "@components/SuccessLottie";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import withTransition from "@components/withTransition";
+import ERC1155Mintable from "@data/ERC1155Mintable.json";
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 
@@ -145,15 +146,17 @@ function App() {
     setLoading(true);
 
     try {
-      const contract = new ethers.Contract(
-        NFT_ADDRESS,
-        TixoCollectionV1.abi,
+      const contractFactory = new ethers.ContractFactory(
+        ERC1155Mintable.abi,
+        ERC1155Mintable.bytecode,
         signer
       );
 
-      const lastEventIdBN = await contract.getLastEventId();
-
-      const txnResult = await contract.createEvent(0, maxTickets);
+      const contract = await contractFactory.deploy(
+        "ipfs://QmfSQg9ZysC4PkNokxBFy6BAFtBxLwVCKQWEBXHnt5G3Er",
+        "ipfs://QmfSQg9ZysC4PkNokxBFy6BAFtBxLwVCKQWEBXHnt5G3Er",
+        [1, 2, 3, 4, 5, 6, 7]
+      );
 
       const eventDateTime = new Date(`${date}T${time}`);
       const timestamp = Math.floor(eventDateTime.getTime() / 1000);
@@ -169,16 +172,16 @@ function App() {
         costPerTicket,
         tokenAddress,
         attendees: {},
-        creationTxn: txnResult,
-        eventId: String(lastEventIdBN.toNumber() + 1),
+        creationTxn: undefined,
+        eventId: contract.address,
         bgImage,
       };
 
       const response = await axios.post(`${TIXO_API_URL}/createEvent`, event);
 
-      setEventId(response.data.eventId);
+      setEventId(contract.address);
       setSuccess(true);
-      setTxnHash(txnResult.hash);
+      setTxnHash(contract.address);
     } catch (err) {
       console.error(err);
     } finally {
@@ -207,7 +210,7 @@ function App() {
             <Button className={styles.button}>Go to event</Button>
           </Link>
           <ChakraLink
-            href={`https://explorer.thetatoken.org/txs/${txnHash}`}
+            href={`https://mumbai.polygonscan.com/tx/${txnHash}`}
             isExternal
           >
             <Button className={styles.button}>View transaction</Button>
@@ -331,16 +334,9 @@ function App() {
                     value={costPerTicket}
                     onChange={(e) => setCostPerTicket(Number(e.target.value))}
                   ></Input>
-                  {/* <Text
-                    position="absolute"
-                    color="rgba(255,255,255,0.5)"
-                    right="20px"
-                  >
-                    {costPerTicket * 0.04} TFUEL
-                  </Text> */}
                   <InputRightElement w="200px" justifyContent="flex-end">
                     <Text color="rgba(255,255,255,0.5)" pr="20px">
-                      {costPerTicket * 0.04} TFUEL
+                      {costPerTicket * 0.57} MATIC
                     </Text>
                   </InputRightElement>
                   {/* </VStack> */}
@@ -348,7 +344,7 @@ function App() {
               </VStack>
               {isTokenGated && (
                 <VStack className={styles.inputContainer}>
-                  <Text>ThetaDrop Token Address</Text>
+                  <Text>Token Contract Address</Text>
                   <Input
                     className={styles.input}
                     value={tokenAddress}

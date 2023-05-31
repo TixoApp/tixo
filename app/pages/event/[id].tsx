@@ -30,7 +30,7 @@ import {
 } from "@chakra-ui/react";
 import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
-import { useAccount, useDisconnect, useSigner } from "wagmi";
+import { useAccount, useDisconnect, useProvider, useSigner } from "wagmi";
 import { ethers } from "ethers";
 import TixoCollectionV1 from "@data/TixoCollectionV1.json";
 import QRCode from "react-qr-code";
@@ -42,22 +42,14 @@ import { ImageContext, TIXO_API_URL, TIXO_CLIENT_URL } from "pages/_app";
 import withTransition from "@components/withTransition";
 import { loadStripe } from "@stripe/stripe-js";
 import { abridgeAddress } from "@utils/utils";
-import {
-  THETA_DROP_NFT_ABI,
-  requestAccounts,
-  getResponse,
-} from "@thetalabs/theta-pass";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import SuccessLottie from "@components/SuccessLottie";
+import ERC1155Mintable from "@data/ERC1155Mintable.json";
+import { useSignMessage } from "wagmi";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
-
-const THETAZILLA_URL =
-  "https://thetazilla.thetadrop.com/content/type_2s2kcznsu3e06en43r3kg50b90c";
-
-const THETAZILLA_ADDRESS = "0x6e7e0c8a1109fdc68e5bca42d54740f333b3545d";
 
 function EventPage() {
   const toast = useToast();
@@ -65,6 +57,7 @@ function EventPage() {
   const { id } = router.query;
   const { address } = useAccount();
   const { data: signer, isError } = useSigner();
+  const provider = useProvider();
   const [event, setEvent] = useState<Event | null>(null);
   const [txnHash, setTxnHash] = useState<string>("");
   const [ticketId, setTicketId] = useState("");
@@ -76,6 +69,11 @@ function EventPage() {
   const [count, setCount] = useState(0);
   const { openConnectModal } = useConnectModal();
   const { disconnect } = useDisconnect();
+
+  const { data: sign, signMessage } = useSignMessage({
+    message:
+      "I am signing this message on the Tixo Ticketing v1 Platform to verify the ownership of the Polygon DevX Community NFT on my wallet.",
+  });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
@@ -138,15 +136,13 @@ function EventPage() {
     try {
       const contract = new ethers.Contract(
         NFT_ADDRESS,
-        TixoCollectionV1.abi,
+        ERC1155Mintable.abi,
         signer
       );
 
-      const txn = await contract.mintWithTokenURI(address, id, "");
-      const lastTicketId = await contract.getLastTicketId(id);
+      const txn = await contract.mint(address, 2, 1);
 
-      const ticketId =
-        parseInt(id as string) * 10 ** 5 + lastTicketId.toNumber() + 1;
+      const ticketId = parseInt(id as string) * 10 ** 5 + 2 + 1;
 
       const newAttendees = JSON.parse(JSON.stringify(event.attendees ?? {}));
 
@@ -166,8 +162,8 @@ function EventPage() {
       );
 
       console.log(response.data);
-      setEvent(updatedEvent);
 
+      setEvent(event);
       await txn.wait();
 
       setTxnHash(txn.hash);
@@ -181,13 +177,9 @@ function EventPage() {
   const verifyOwnership = useCallback(async (userAddress: string) => {
     if (!userAddress) return;
 
-    const provider = new ethers.providers.JsonRpcProvider(
-      "https://eth-rpc-api.thetatoken.org/rpc"
-    );
-
     const contract = new ethers.Contract(
-      THETAZILLA_ADDRESS,
-      THETA_DROP_NFT_ABI,
+      NFT_ADDRESS,
+      ERC1155Mintable.abi,
       provider
     );
 
@@ -196,27 +188,6 @@ function EventPage() {
 
     setIsOwner(isOwner);
   }, []);
-
-  const finishViaRedirect = useCallback(async () => {
-    try {
-      const response = await getResponse();
-
-      if (response) {
-        const { result } = response;
-        const walletAddress = result[0];
-        verifyOwnership(walletAddress);
-      }
-    } catch (e) {}
-  }, [verifyOwnership]);
-
-  const requestAccountsViaRedirect = useCallback(async () => {
-    const redirectUrl = router ? `${TIXO_CLIENT_URL}${router.asPath}` : "";
-    await requestAccounts(redirectUrl, null, false);
-  }, [router]);
-
-  useEffect(() => {
-    finishViaRedirect();
-  }, [finishViaRedirect]);
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -278,6 +249,7 @@ function EventPage() {
       setCount((prev) => prev + 1);
     }
   };
+  console.log("event: ", event);
 
   return (
     <main className={styles.main}>
@@ -360,7 +332,6 @@ function EventPage() {
                   {event.costPerTicket === 0
                     ? "FREE"
                     : `$${event.costPerTicket}`}
-                  `
                 </Text>
               </VStack>
               <HStack gap={1}>
@@ -466,7 +437,7 @@ function EventPage() {
                 <VStack w="100%">
                   {event && event.tokenAddress && !isOwner ? (
                     <Button
-                      onClick={requestAccountsViaRedirect}
+                      onClick={() => signMessage?.()}
                       className={styles.button}
                     >
                       Verify Access
@@ -562,9 +533,9 @@ function EventPage() {
                             className={styles.drawerButton}
                             onClick={handleMintTicket}
                           >
-                            <Image src="/tfuel.png" className={styles.tfuel} />
+                            <Image src="/matic.png" className={styles.matic} />
                             <Text className={styles.buttonLabel}>
-                              Pay with TFUEL
+                              Pay with MATIC
                             </Text>
                           </HStack>
                           <HStack

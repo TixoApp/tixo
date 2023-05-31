@@ -157,7 +157,7 @@
 }
 
 .previewContainer {
-  top: -8px;
+  top: 0px;
   width: 400px !important;
   height: 400px !important;
   position: absolute;
@@ -369,8 +369,8 @@
     transform: scale(0.95);
   }
 
-  .tfuel {
-    width: 100px;
+  .matic {
+    width: 110px;
   }
 
   .visa {
@@ -446,7 +446,7 @@
 }
 
 .bgPreviewContainer {
-  top: -8px;
+  top: -0px;
   width: 100px !important;
   height: 100px !important;
   position: absolute;

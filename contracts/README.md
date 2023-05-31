@@ -25,7 +25,7 @@ The contract is named `TixoCollectionV1` and extends `ERC721URIStorage` and `Own
 - Any user can query the latest event ID, last ticket ID for a specific event, ticket price for a specific event, and the owner of a specific event.
 
 ## How To Use
-To use this smart contract, you'll need to deploy it on an EVM network (like the mainnet, Theta Network, etc.) using a deployment tool like Truffle, Hardhat, or Remix.
+To use this smart contract, you'll need to deploy it on an EVM network (like the mainnet, Polygon, etc.) using a deployment tool like Truffle, Hardhat, or Remix.
 
 This includes creating events, minting tickets by paying the specified ticket price, and querying information about events and tickets.
 

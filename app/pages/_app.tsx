@@ -19,26 +19,26 @@ import Navbar from "@components/Navbar";
 export const TIXO_API_URL = process.env.NEXT_PUBLIC_TIXO_API_URL;
 export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
 
-const thetaTestnet: Chain = {
-  id: 365,
-  name: "Theta Testnet",
-  network: "TFUEL",
+const polygonMumbai: Chain = {
+  id: 80001,
+  name: "Polygon Mumbai",
+  network: "MATIC",
   nativeCurrency: {
     decimals: 18,
-    name: "TFUEL",
-    symbol: "TFUEL",
+    name: "MATIC",
+    symbol: "MATIC",
   },
   rpcUrls: {
-    default: "https://eth-rpc-api-testnet.thetatoken.org/rpc",
+    default: "https://matic-mumbai.chainstacklabs.com",
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://beta-explorer.thetatoken.org/" },
+    default: { name: "Explorer", url: "https://mumbai.polygonscan.com/" },
   },
   testnet: true,
 };
 
 const { chains, provider } = configureChains(
-  [thetaTestnet],
+  [polygonMumbai],
   [publicProvider()]
 );
 
@@ -59,6 +59,9 @@ const theme = extendTheme({
       "*": {
         fontFamily: "Montserrat",
         color: "white",
+      },
+      button: {
+        color: "white !important",
       },
       a: {
         _hover: {
