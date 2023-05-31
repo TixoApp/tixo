@@ -14,6 +14,7 @@ import {
   InputGroup,
   InputLeftElement,
   InputRightElement,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import axios from "axios";
 import Link from "next/link";
@@ -113,6 +114,7 @@ function App() {
   const [bgImage, setBgImage] = useState("");
   const [isLoading, setLoading] = useState(false);
   const [isSuccess, setSuccess] = useState(false);
+  const [txnHash, setTxnHash] = useState("");
   const [eventId, setEventId] = useState("");
   const [showIcon, setShowIcon] = useState(true);
   const [uploadedImage, setUploadedImage] = useState<Blob>();
@@ -176,6 +178,7 @@ function App() {
 
       setEventId(response.data.eventId);
       setSuccess(true);
+      setTxnHash(txnResult.hash);
     } catch (err) {
       console.error(err);
     } finally {
@@ -199,9 +202,17 @@ function App() {
         <Text>Event Created Successfully</Text>
         <Text className={styles.title}>{eventName}</Text>
         <SuccessLottie />
-        <Link href={`/event/${eventId}`}>
-          <Button className={styles.button}>Go to event</Button>
-        </Link>
+        <HStack>
+          <Link href={`/event/${eventId}`}>
+            <Button className={styles.button}>Go to event</Button>
+          </Link>
+          <ChakraLink
+            href={`https://explorer.thetatoken.org/txs/${txnHash}`}
+            isExternal
+          >
+            <Button className={styles.button}>View transaction</Button>
+          </ChakraLink>
+        </HStack>
       </main>
     );
 

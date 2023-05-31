@@ -322,7 +322,7 @@ function EventPage() {
               </Text>
               <VStack alignItems="flex-start">
                 <Text className={styles.eventDate}>
-                  {format(new Date(event.date), "eeee, MMMM do")}
+                  {format(new Date(event.date * 1000), "eeee, MMMM do")}
                 </Text>
                 <Text className={styles.eventTime}>{formattedTime}</Text>
               </VStack>
@@ -355,7 +355,13 @@ function EventPage() {
                   {event.maxTickets - Object.keys(event.attendees).length}/
                   {event.maxTickets}
                 </Text>
-                <Text>Cost per Ticket: {event.costPerTicket}</Text>
+                <Text>
+                  Cost per Ticket:{" "}
+                  {event.costPerTicket === 0
+                    ? "FREE"
+                    : `$${event.costPerTicket}`}
+                  `
+                </Text>
               </VStack>
               <HStack gap={1}>
                 {!ticketId ? (
@@ -377,7 +383,7 @@ function EventPage() {
               </HStack>
             </VStack>
             <VStack>
-              <Image src="/image.jpg" className={styles.eventImage} />
+              <Image src="/image.jpg" className={styles.eventImage} w="400px" />
             </VStack>
           </HStack>
         ) : (
@@ -414,7 +420,7 @@ function EventPage() {
                   <VStack alignItems="flex-start" pb="8px">
                     <Text className={styles.eventDateMobile}>
                       {format(
-                        new Date(event.date ? event.date : "2023-06-04"),
+                        new Date(event.date ? event.date * 1000 : "2023-06-04"),
                         "eeee, MMMM do"
                       )}
                     </Text>
@@ -608,7 +614,7 @@ function EventPage() {
                 <VStack alignItems="flex-start">
                   <Text className={styles.eventDateMobile}>
                     {format(
-                      new Date(event.date ? event.date : "2023-06-04"),
+                      new Date(event.date ? event.date * 1000 : "2023-06-04"),
                       "eeee, MMMM do"
                     )}
                   </Text>
