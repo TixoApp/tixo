@@ -32,14 +32,18 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 - Event monitoring dashboard for tracking purchases
 - Custodial and non-custodial ticket vault solutions
 
-## Market opportunity in ticketing
-
-In a rapidly growing online ticketing economy projected to reach $68 billion by 2025, TIXO leads the innovation, offering a more consumer-friendly, transparent, and profitable method of ticketing live events. TIXO provides an unparalleled payment processing experience that's tailored to its needs, reinforcing its credibility as an early player in the Web3 landscape. The integration is smooth, secure, and hassle-free, complete with real-time fraud detection mechanisms that safeguard transaction flows.
-
-TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
-
 ## How we built it
-The base app is a standard NextJS application with a Node server. Our smart contracts were written in Solidity using the Hardhat Ethereum development environment to deploy to Polygon Mumbai for the demo. We used MATIC and the Stripe API for payment rails on the v1 prototype application.
+- Frontend: NextJS, Chakra UI, RainbowKit, wagmi hooks
+
+- Payment Rails: MATIC (crypto), Stripe API (fiat)
+
+- Server: ExpressJS, Hardhat, Web3.Storage Stripe API
+
+- Node Endpoint: Luniverse API on Polygon Mumbai (`https://polygon-mumbai.luniverse.io/${LUNIVERSE_NODE_ID}`)
+
+- Event Contract: ERC1155Mintable Template from Infura SDK
+
+![](app/public/architecture.png)
 
 ## What's next for TIXO
 
@@ -51,3 +55,9 @@ We want to build the next-generation event ticketing platform powered by Polygon
 - Add advanced metrics for host event dashboard
 - Marketing and partnerships to beta test platform launch
 - Export custodial ticket accounts via private key export
+
+## Market opportunity in ticketing
+
+In a rapidly growing online ticketing economy projected to reach $68 billion by 2025, TIXO leads the innovation, offering a more consumer-friendly, transparent, and profitable method of ticketing live events. TIXO provides an unparalleled payment processing experience that's tailored to its needs, reinforcing its credibility as an early player in the Web3 landscape. The integration is smooth, secure, and hassle-free, complete with real-time fraud detection mechanisms that safeguard transaction flows.
+
+TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
