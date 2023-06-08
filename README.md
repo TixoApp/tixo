@@ -61,3 +61,29 @@ We want to build the next-generation event ticketing platform powered by Polygon
 In a rapidly growing online ticketing economy projected to reach $68 billion by 2025, TIXO leads the innovation, offering a more consumer-friendly, transparent, and profitable method of ticketing live events. TIXO provides an unparalleled payment processing experience that's tailored to its needs, reinforcing its credibility as an early player in the Web3 landscape. The integration is smooth, secure, and hassle-free, complete with real-time fraud detection mechanisms that safeguard transaction flows.
 
 TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
+
+## Feedback for Luniverse Team
+
+We'd like to take this opportunity to provide some constructive feedback based on my recent experience with Luniverse.
+
+Firstly, the dashboard was clearly designed, user-friendly, and quite intuitive. The straightforward nature of your platform makes the learning curve for newcomers significantly less steep, which is highly appreciated.
+
+Despite the positive aspects, we encountered some difficulties while creating a Node for Polygon Mumbai. There have been instances where errors were encountered, the root cause of which was not entirely clear. It would be of great benefit to both the user experience and the robustness of your platform if this issue could be investigated and resolved.
+
+Looking forward, we believe it would greatly enrich the platform if support could be introduced for an advanced NFT API. In particular, the addition of the following methods could potentially open up many new avenues for users:
+
+- `getOwnersForToken`
+- `getOwnersForCollection`
+- `isHolderOfCollection`
+- `getNFTMetadata`
+- `getNFTMetadataBatch`
+- `getContractMetadata`
+- `getContractMetadataBatch`
+- `searchContractMetadata`
+- `getSpamContracts`
+- `isSpamContract`
+- `getFloorPrice`
+- `getNFTSales`
+- `computeRarity`
+- `summarizeNFTAttributes`
+
