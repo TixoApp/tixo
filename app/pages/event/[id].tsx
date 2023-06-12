@@ -249,7 +249,16 @@ function EventPage() {
       setCount((prev) => prev + 1);
     }
   };
-  console.log("event: ", event);
+
+  if (!isMobile)
+    return (
+      <main className={styles.main}>
+        <Text className={styles.mobileText}>
+          This page is only supported on mobile at the moment. Thank you for
+          understanding.
+        </Text>
+      </main>
+    );
 
   return (
     <main className={styles.main}>

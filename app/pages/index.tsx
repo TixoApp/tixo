@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import styles from "@styles/Home.module.css";
 import { useAccount, useSigner } from "wagmi";
 import {
@@ -118,6 +118,7 @@ function App() {
   const [txnHash, setTxnHash] = useState("");
   const [eventId, setEventId] = useState("");
   const [showIcon, setShowIcon] = useState(true);
+  const [width, setWidth] = useState<number>(window.innerWidth);
   const [uploadedImage, setUploadedImage] = useState<Blob>();
   const { setSelectedImage } = useContext(ImageContext);
 
@@ -197,7 +198,30 @@ function App() {
     setSelectedImage("/0.jpg");
   }, []);
 
+  function handleWindowSizeChange() {
+    setWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    window.addEventListener("resize", handleWindowSizeChange);
+    return () => {
+      window.removeEventListener("resize", handleWindowSizeChange);
+    };
+  }, []);
+
+  const isMobile = useMemo(() => width <= 500, [width]);
+
   if (!address) return <Landing />;
+
+  if (isMobile)
+    return (
+      <main className={styles.main}>
+        <Text textAlign="center">
+          This page is only supported on desktop at the moment. Thank you for
+          understanding.
+        </Text>
+      </main>
+    );
 
   if (isSuccess)
     return (
