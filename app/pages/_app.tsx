@@ -29,7 +29,7 @@ const polygonMumbai: Chain = {
     symbol: "MATIC",
   },
   rpcUrls: {
-    default: "https://matic-mumbai.chainstacklabs.com",
+    default: "https://polygon-mumbai.luniverse.io/1683724746355925008",
   },
   blockExplorers: {
     default: { name: "Explorer", url: "https://mumbai.polygonscan.com/" },
