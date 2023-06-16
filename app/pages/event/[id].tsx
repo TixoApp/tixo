@@ -72,7 +72,7 @@ function EventPage() {
 
   const { data: sign, signMessage } = useSignMessage({
     message:
-      "I am signing this message on the Tixo Ticketing v1 Platform to verify the ownership of the Polygon DevX Community NFT on my wallet.",
+      "I am signing this message on the Tixo Ticketing v1 Platform to verify the ownership of the Encode Aurora Community NFT on my wallet.",
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -542,9 +542,12 @@ function EventPage() {
                             className={styles.drawerButton}
                             onClick={handleMintTicket}
                           >
-                            <Image src="/matic.png" className={styles.matic} />
+                            <Image
+                              src="/aurora1.png"
+                              className={styles.aurora}
+                            />
                             <Text className={styles.buttonLabel}>
-                              Pay with MATIC
+                              Pay with aETH
                             </Text>
                           </HStack>
                           <HStack

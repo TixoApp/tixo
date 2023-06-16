@@ -19,26 +19,26 @@ import Navbar from "@components/Navbar";
 export const TIXO_API_URL = process.env.NEXT_PUBLIC_TIXO_API_URL;
 export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
 
-const polygonMumbai: Chain = {
-  id: 80001,
-  name: "Polygon Mumbai",
-  network: "MATIC",
+const auroraTestnet: Chain = {
+  id: 1313161555,
+  name: "Aurora Testnet",
+  network: "aETH",
   nativeCurrency: {
     decimals: 18,
-    name: "MATIC",
-    symbol: "MATIC",
+    name: "aETH",
+    symbol: "aETH",
   },
   rpcUrls: {
-    default: "https://polygon-mumbai.luniverse.io/1683724746355925008",
+    default: "https://testnet.aurora.dev",
   },
   blockExplorers: {
-    default: { name: "Explorer", url: "https://mumbai.polygonscan.com/" },
+    default: { name: "Explorer", url: "https://explorer.testnet.aurora.dev/" },
   },
   testnet: true,
 };
 
 const { chains, provider } = configureChains(
-  [polygonMumbai],
+  [auroraTestnet],
   [publicProvider()]
 );
 

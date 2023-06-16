@@ -1,11 +1,10 @@
-# TIXO: Next-Generation Ticketing on Polygon
+# TIXO: Next-Generation Ticketing on Aurora
 
-This project was built specifically for the Polygon DevX Hackathon.
+This project was built for the Encode Club Aurora Hackathon, specifically for the Aurora Tokenization and Entertainment, Digital Media, and NFTs Challenges.
 
-View the full demo walkthrough here: https://vimeo.com/832694198
+View the full demo walkthrough here: https://vimeo.com/838419544
 
 ![](/app/public/landing.png)
-
 
 Learn more about the Tixo Protocol V1 here: [Tixo Protocol](/contracts/)
 
@@ -27,7 +26,7 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 - Token-gated private event ticketing
 - UI Customized for ticketing pages
 - Mobile-first ticket purchase flow with multi-payments
-- Payment integration with MATIC and Stripe API
+- Payment integration with aETH and Stripe API
 - QR code powered ticket verification process
 - Event monitoring dashboard for tracking purchases
 - Custodial and non-custodial ticket vault solutions
@@ -35,23 +34,19 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 ## How we built it
 - Frontend: NextJS, Chakra UI, RainbowKit, wagmi hooks
 
-- Payment Rails: MATIC (crypto), Stripe API (fiat)
+- Payment Rails: Aurora ETH (crypto), Stripe API (fiat)
 
 - Server: ExpressJS, Hardhat, Web3.Storage Stripe API
-
-- Node Endpoint: Luniverse API on Polygon Mumbai (`https://polygon-mumbai.luniverse.io/${LUNIVERSE_NODE_ID}`)
-
-- Event Contract: ERC1155Mintable Template from Infura SDK
 
 ![](app/public/architecture.png)
 
 ## What's next for TIXO
 
-We want to build the next-generation event ticketing platform powered by Polygon Network. Some next step features we want to integrate into our application are the following:
+We want to build the next-generation event ticketing platform powered by Aurora Network. Some next step features we want to integrate into our application are the following:
 - Build React-Native mobile app for v2 prototype
 - Tiered ticket sales (i.e. VIP, General Admissions)
 - Seating selection for large venue events
-- Add ERC-20 payment method for token communities on Polygon
+- Add ERC-20 payment method for token communities on Aurora
 - Add advanced metrics for host event dashboard
 - Marketing and partnerships to beta test platform launch
 - Export custodial ticket accounts via private key export
@@ -62,28 +57,7 @@ In a rapidly growing online ticketing economy projected to reach $68 billion by 
 
 TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
 
-## Feedback for Luniverse Team
+## Note on Hackathon Bounties
+Aurora Tokenization Challenge: We believe the tokenization of event tickets presents an innovative way to secure, manage and trade tickets. It not only mitigates counterfeiting and fraud risks through immutable blockchain technology, but also enhances ticket traceability, ensuring rightful ownership. Through smart contracts, tokenized tickets allow for dynamic pricing and customizable resale rules, thereby preventing exorbitant reselling prices. Additionally, these tokens enable frictionless peer-to-peer transactions, fostering a more efficient secondary market. Importantly, they offer improved data transparency and audience insights, creating the potential for personalized user experiences. Thus, tokenization of event tickets is a significant leap towards a more secure, user-centric event industry, which is why it's so critical to build a smooth UX platform like Tixo to facilitate this thesis.
 
-We'd like to take this opportunity to provide some constructive feedback based on my recent experience with Luniverse.
-
-Firstly, the dashboard was clearly designed, user-friendly, and quite intuitive. The straightforward nature of your platform makes the learning curve for newcomers significantly less steep, which is highly appreciated.
-
-Despite the positive aspects, we encountered some difficulties while creating a Node for Polygon Mumbai. There have been instances where errors were encountered, the root cause of which was not entirely clear. It would be of great benefit to both the user experience and the robustness of your platform if this issue could be investigated and resolved.
-
-Looking forward, we believe it would greatly enrich the platform if support could be introduced for an advanced NFT API. In particular, the addition of the following methods could potentially open up many new avenues for users:
-
-- `getOwnersForToken`
-- `getOwnersForCollection`
-- `isHolderOfCollection`
-- `getNFTMetadata`
-- `getNFTMetadataBatch`
-- `getContractMetadata`
-- `getContractMetadataBatch`
-- `searchContractMetadata`
-- `getSpamContracts`
-- `isSpamContract`
-- `getFloorPrice`
-- `getNFTSales`
-- `computeRarity`
-- `summarizeNFTAttributes`
-
+Aurora Entertainment, Digital Media, and NFTs Challenges: Tixo secures data privacy and intellectual property through blockchain technology. Patrons purchase unique tokenized tickets, ensuring rightful ownership and combating counterfeit. Artist commissions can be encoded into smart contracts, ensuring transparent, instant payments upon ticket sale. Any resale triggers automated commission payouts, discouraging middlemen fee scalping. Simultaneously, anonymous yet verifiable audience data analytics enhance user experiences while respecting privacy. Tixo, through Aurora, revolutionizes the event industry, addressing its prevalent challenges.
