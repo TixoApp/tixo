@@ -1,14 +1,16 @@
 const hre = require("hardhat");
 
 async function main() {
-  const TixoProtocolV1 = await hre.ethers.getContractFactory("TixoProtocolV1");
-  const tixoProtocolV1 = await TixoProtocolV1.deploy();
+  const EncodeAuroraToken = await hre.ethers.getContractFactory(
+    "EncodeAuroraToken"
+  );
+  const encodeAuroraToken = await EncodeAuroraToken.deploy();
 
   console.log("deploying...");
 
-  await tixoProtocolV1.deployed();
+  await encodeAuroraToken.deployed();
 
-  console.log(`Deployed successfully at: ${tixoProtocolV1.address}`);
+  console.log(`Deployed successfully at: ${encodeAuroraToken.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

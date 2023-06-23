@@ -2,7 +2,7 @@
 Tixo Protocol is used to manage the creation of events, minting of tickets and the subsequent ownership of those tickets.
 
 ## Contract Details
-The contract is named `TixoCollectionV1` and extends `ERC721URIStorage` and `Ownable` from OpenZeppelin. It uses `Counters` for managing unique IDs for events and tickets.
+The contract is named `TixoProtocolV1` and extends `ERC721URIStorage` and `Ownable` from OpenZeppelin. It uses `Counters` for managing unique IDs for events and tickets.
 
 ### Key Features
 

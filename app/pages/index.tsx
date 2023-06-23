@@ -20,14 +20,13 @@ import axios from "axios";
 import Link from "next/link";
 import { Event } from "@utils/types";
 import { ethers } from "ethers";
-import TixoCollectionV1 from "@data/TixoCollectionV1.json";
+import TixoProtocolV1 from "@data/TixoProtocolV1.json";
 import Landing from "@components/Landing";
 import { ImageContext, TIXO_API_URL } from "./_app";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 import SuccessLottie from "@components/SuccessLottie";
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 import withTransition from "@components/withTransition";
-import ERC1155Mintable from "@data/ERC1155Mintable.json";
 
 const NFT_ADDRESS = process.env.NEXT_PUBLIC_TIXO_ADDRESS;
 
@@ -147,17 +146,15 @@ function App() {
     setLoading(true);
 
     try {
-      const contractFactory = new ethers.ContractFactory(
-        ERC1155Mintable.abi,
-        ERC1155Mintable.bytecode,
+      const contract = new ethers.Contract(
+        NFT_ADDRESS,
+        TixoProtocolV1.abi,
         signer
       );
 
-      const contract = await contractFactory.deploy(
-        "ipfs://QmfSQg9ZysC4PkNokxBFy6BAFtBxLwVCKQWEBXHnt5G3Er",
-        "ipfs://QmfSQg9ZysC4PkNokxBFy6BAFtBxLwVCKQWEBXHnt5G3Er",
-        [1, 2, 3, 4, 5, 6, 7]
-      );
+      const lastEventIdBN = await contract.getLastEventId();
+
+      const txnResult = await contract.createEvent(0, maxTickets);
 
       const eventDateTime = new Date(`${date}T${time}`);
       const timestamp = Math.floor(eventDateTime.getTime() / 1000);
@@ -173,16 +170,16 @@ function App() {
         costPerTicket,
         tokenAddress,
         attendees: {},
-        creationTxn: undefined,
-        eventId: contract.address,
+        creationTxn: txnResult,
+        eventId: String(lastEventIdBN.toNumber() + 1),
         bgImage,
       };
 
       const response = await axios.post(`${TIXO_API_URL}/createEvent`, event);
 
-      setEventId(contract.address);
+      setEventId(response.data.eventId);
       setSuccess(true);
-      setTxnHash(contract.address);
+      setTxnHash(txnResult.hash);
     } catch (err) {
       console.error(err);
     } finally {
@@ -234,7 +231,7 @@ function App() {
             <Button className={styles.button}>Go to event</Button>
           </Link>
           <ChakraLink
-            href={`https://mumbai.polygonscan.com/tx/${txnHash}`}
+            href={`https://explorer.testnet.aurora.dev/tx/${txnHash}`}
             isExternal
           >
             <Button className={styles.button}>View transaction</Button>
@@ -360,7 +357,7 @@ function App() {
                   ></Input>
                   <InputRightElement w="200px" justifyContent="flex-end">
                     <Text color="rgba(255,255,255,0.5)" pr="20px">
-                      {costPerTicket * 0.57} MATIC
+                      {costPerTicket * 0.00052} aETH
                     </Text>
                   </InputRightElement>
                   {/* </VStack> */}

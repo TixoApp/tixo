@@ -32,7 +32,7 @@ import { Event } from "@utils/types";
 import styles from "@styles/Home.module.css";
 import { useAccount, useDisconnect, useProvider, useSigner } from "wagmi";
 import { ethers } from "ethers";
-import TixoCollectionV1 from "@data/TixoCollectionV1.json";
+import TixoProtocolV1 from "@data/TixoProtocolV1.json";
 import QRCode from "react-qr-code";
 import ReactCardFlip from "react-card-flip";
 import { format } from "date-fns";
@@ -44,7 +44,6 @@ import { loadStripe } from "@stripe/stripe-js";
 import { abridgeAddress } from "@utils/utils";
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import SuccessLottie from "@components/SuccessLottie";
-import ERC1155Mintable from "@data/ERC1155Mintable.json";
 import { useSignMessage } from "wagmi";
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_API_KEY);
@@ -136,13 +135,15 @@ function EventPage() {
     try {
       const contract = new ethers.Contract(
         NFT_ADDRESS,
-        ERC1155Mintable.abi,
+        TixoProtocolV1.abi,
         signer
       );
 
-      const txn = await contract.mint(address, 2, 1);
+      const txn = await contract.mintWithTokenURI(address, id, "");
+      const lastTicketId = await contract.getLastTicketId(id);
 
-      const ticketId = parseInt(id as string) * 10 ** 5 + 2 + 1;
+      const ticketId =
+        parseInt(id as string) * 10 ** 5 + lastTicketId.toNumber() + 1;
 
       const newAttendees = JSON.parse(JSON.stringify(event.attendees ?? {}));
 
@@ -162,8 +163,8 @@ function EventPage() {
       );
 
       console.log(response.data);
+      setEvent(updatedEvent);
 
-      setEvent(event);
       await txn.wait();
 
       setTxnHash(txn.hash);
@@ -179,7 +180,7 @@ function EventPage() {
 
     const contract = new ethers.Contract(
       NFT_ADDRESS,
-      ERC1155Mintable.abi,
+      TixoProtocolV1.abi,
       provider
     );
 
@@ -250,15 +251,15 @@ function EventPage() {
     }
   };
 
-  if (!isMobile)
-    return (
-      <main className={styles.main}>
-        <Text className={styles.mobileText}>
-          This page is only supported on mobile at the moment. Thank you for
-          understanding.
-        </Text>
-      </main>
-    );
+  // if (!isMobile)
+  //   return (
+  //     <main className={styles.main}>
+  //       <Text className={styles.mobileText}>
+  //         This page is only supported on mobile at the moment. Thank you for
+  //         understanding.
+  //       </Text>
+  //     </main>
+  //   );
 
   return (
     <main className={styles.main}>

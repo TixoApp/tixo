@@ -2,15 +2,15 @@ const hre = require("hardhat");
 
 async function main() {
   try {
-    const TixoCollectionV1 = await hre.ethers.getContractFactory(
-      "TixoCollectionV1"
+    const TixoProtocolV1 = await hre.ethers.getContractFactory(
+      "TixoProtocolV1"
     );
 
-    const tixo = await TixoCollectionV1.attach(
+    const tixo = await TixoProtocolV1.attach(
       process.env.TIXO_ADDRESS // deployed contract address
     );
 
-    console.log("TixoCollectionV1 attached to:", tixo.address);
+    console.log("TixoProtocolV1 attached to:", tixo.address);
 
     console.log("Creating event...");
 

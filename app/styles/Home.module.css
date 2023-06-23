@@ -392,9 +392,6 @@
 
 .bgUploadContainer {
   position: relative;
-  border: 0.5px solid #ffffff;
-  border-radius: 15px;
-  display: flex;
   justify-content: center !important;
   align-items: center !important;
   font-weight: 400;
@@ -437,7 +434,7 @@
 
 .bgInputText {
   position: absolute;
-  top: 24px;
+  top: 31px;
   width: 100%;
   justify-content: space-between;
   padding: 0 3rem;
