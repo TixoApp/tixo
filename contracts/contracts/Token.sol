@@ -5,8 +5,8 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract EncodeAuroraToken is ERC721, ERC721URIStorage, Ownable {
-    constructor() ERC721("Encode Aurora", "ENCAUR") {}
+contract FantomHackerNFT is ERC721, ERC721URIStorage, Ownable {
+    constructor() ERC721("Fantom Hacker NFT", "FTMHACK") {}
 
     function safeMint(address to, uint256 tokenId, string memory uri)
         public

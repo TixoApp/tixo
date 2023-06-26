@@ -2,15 +2,13 @@ const hre = require("hardhat");
 
 async function main() {
   try {
-    const EncodeAuroraToken = await hre.ethers.getContractFactory(
-      "EncodeAuroraToken"
-    );
+    const tokenFactory = await hre.ethers.getContractFactory("FantomHackerNFT");
 
-    const token = await EncodeAuroraToken.attach(
+    const token = await tokenFactory.attach(
       "0x440551d6b96D37C04656EB41594fECe89249bd3a"
     );
 
-    console.log("EncodeAuroraToken attached to:", token.address);
+    console.log("FantomHackerNFT attached to:", token.address);
 
     console.log("Creating event...");
 

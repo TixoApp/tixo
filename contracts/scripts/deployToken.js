@@ -1,16 +1,16 @@
 const hre = require("hardhat");
 
 async function main() {
-  const EncodeAuroraToken = await hre.ethers.getContractFactory(
-    "EncodeAuroraToken"
+  const FantomHackerNFT = await hre.ethers.getContractFactory(
+    "FantomHackerNFT"
   );
-  const encodeAuroraToken = await EncodeAuroraToken.deploy();
+  const nft = await FantomHackerNFT.deploy();
 
   console.log("deploying...");
 
-  await encodeAuroraToken.deployed();
+  await nft.deployed();
 
-  console.log(`Deployed successfully at: ${encodeAuroraToken.address}`);
+  console.log(`Deployed successfully at: ${nft.address}`);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

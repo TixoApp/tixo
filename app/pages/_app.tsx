@@ -12,6 +12,7 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { publicProvider } from "wagmi/providers/public";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
+import { fantomTestnet } from "wagmi/chains";
 import merge from "lodash.merge";
 import Head from "next/head";
 import Navbar from "@components/Navbar";
@@ -19,26 +20,8 @@ import Navbar from "@components/Navbar";
 export const TIXO_API_URL = process.env.NEXT_PUBLIC_TIXO_API_URL;
 export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
 
-const auroraTestnet: Chain = {
-  id: 1313161555,
-  name: "Aurora Testnet",
-  network: "aETH",
-  nativeCurrency: {
-    decimals: 18,
-    name: "aETH",
-    symbol: "aETH",
-  },
-  rpcUrls: {
-    default: "https://testnet.aurora.dev",
-  },
-  blockExplorers: {
-    default: { name: "Explorer", url: "https://explorer.testnet.aurora.dev/" },
-  },
-  testnet: true,
-};
-
 const { chains, provider } = configureChains(
-  [auroraTestnet],
+  [fantomTestnet],
   [publicProvider()]
 );
 

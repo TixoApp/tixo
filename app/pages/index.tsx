@@ -231,7 +231,7 @@ function App() {
             <Button className={styles.button}>Go to event</Button>
           </Link>
           <ChakraLink
-            href={`https://explorer.testnet.aurora.dev/tx/${txnHash}`}
+            href={`https://testnet.ftmscan.com/tx/${txnHash}`}
             isExternal
           >
             <Button className={styles.button}>View transaction</Button>

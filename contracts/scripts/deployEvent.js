@@ -21,8 +21,8 @@ const sdk = new SDK(auth);
   try {
     // CREATE CONTRACT Metadata
     const collectionMetadata = Metadata.openSeaCollectionLevelStandard({
-      name: "Encode Aurora Community NFT",
-      description: "Welcome to the Encode Aurora Community NFT.",
+      name: "Fantom Hacker Community NFT",
+      description: "Welcome to the Fantom Hacker Community NFT.",
       image: await sdk.storeFile({
         metadata:
           "https://bafybeia474bx6uqs35bza2gihbofwm6wxwnkqlrsmfdis7dszpvlhaocji.ipfs.w3s.link/641b125cd69c80355cae2d51_blog%20header.png",

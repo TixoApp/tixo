@@ -71,7 +71,7 @@ function EventPage() {
 
   const { data: sign, signMessage } = useSignMessage({
     message:
-      "I am signing this message on the Tixo Ticketing v1 Platform to verify the ownership of the Encode Aurora Community NFT on my wallet.",
+      "I am signing this message on the Tixo Ticketing v1 Platform to verify the ownership of the Fantom Hacker Community NFT on my wallet.",
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -544,11 +544,11 @@ function EventPage() {
                             onClick={handleMintTicket}
                           >
                             <Image
-                              src="/aurora1.png"
-                              className={styles.aurora}
+                              src="/fantom.png"
+                              className={styles.fantom}
                             />
                             <Text className={styles.buttonLabel}>
-                              Pay with aETH
+                              Pay with FTM
                             </Text>
                           </HStack>
                           <HStack

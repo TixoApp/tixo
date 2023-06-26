@@ -15,11 +15,17 @@ task("etherscan-verify", "Verifies on etherscan", async (taskArgs, hre) => {
 /** @type import('hardhat/config').HardhatUserConfig */
 module.exports = {
   solidity: "0.8.17",
-  defaultNetwork: "aurora",
+  defaultNetwork: "ftmTestnet",
   networks: {
-    aurora: {
-      url: `https://testnet.aurora.dev/`,
-      accounts: [`0x${PRIVATE_KEY}`],
+    ftmTestnet: {
+      url: "https://rpc.testnet.fantom.network/",
+      accounts: [process.env.PRIVATE_KEY],
+      chainId: 4002,
+    },
+  },
+  etherscan: {
+    apiKey: {
+      ftmTestnet: FTMSCAN_API_KEY,
     },
   },
 };

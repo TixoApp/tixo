@@ -1,8 +1,6 @@
-# TIXO: Next-Generation Ticketing on Aurora
+# TIXO: Next-Generation Ticketing powered by Fantom Blockchain
 
-This project was built for the Encode Club Aurora Hackathon, specifically for the Aurora Tokenization and Entertainment, Digital Media, and NFTs Challenges.
-
-View the full demo walkthrough here: https://vimeo.com/838419544
+This project was built for the Fantom Hackathon Q2 2023.
 
 ![](/app/public/landing.png)
 
@@ -34,19 +32,19 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 ## How we built it
 - Frontend: NextJS, Chakra UI, RainbowKit, wagmi hooks
 
-- Payment Rails: Aurora ETH (crypto), Stripe API (fiat)
+- Payment Rails: Fantom FTM (crypto), Stripe API (fiat)
 
-- Server: ExpressJS, Hardhat, Web3.Storage Stripe API
+- Server: ExpressJS, Hardhat, Web3.Storage
 
 ![](app/public/architecture.png)
 
 ## What's next for TIXO
 
-We want to build the next-generation event ticketing platform powered by Aurora Network. Some next step features we want to integrate into our application are the following:
+We want to build the next-generation event ticketing platform powered by the Fantom Blockchain. Some next step features we want to integrate into our application are the following:
 - Build React-Native mobile app for v2 prototype
 - Tiered ticket sales (i.e. VIP, General Admissions)
 - Seating selection for large venue events
-- Add ERC-20 payment method for token communities on Aurora
+- Add ERC-20 payment method for token communities on Fantom
 - Add advanced metrics for host event dashboard
 - Marketing and partnerships to beta test platform launch
 - Export custodial ticket accounts via private key export
@@ -56,8 +54,3 @@ We want to build the next-generation event ticketing platform powered by Aurora 
 In a rapidly growing online ticketing economy projected to reach $68 billion by 2025, TIXO leads the innovation, offering a more consumer-friendly, transparent, and profitable method of ticketing live events. TIXO provides an unparalleled payment processing experience that's tailored to its needs, reinforcing its credibility as an early player in the Web3 landscape. The integration is smooth, secure, and hassle-free, complete with real-time fraud detection mechanisms that safeguard transaction flows.
 
 TIXO, grounded in advanced Web3 technology, delivers a trusted and familiar user experience, creating a seamless ticketing ecosystem where fans feel they're buying tickets directly from the artists. With TIXO, creators take control, fans gain authentic experiences, and live events become more profitable - welcome to the future of live event ticketing.
-
-## Note on Hackathon Bounties
-Aurora Tokenization Challenge: We believe the tokenization of event tickets presents an innovative way to secure, manage and trade tickets. It not only mitigates counterfeiting and fraud risks through immutable blockchain technology, but also enhances ticket traceability, ensuring rightful ownership. Through smart contracts, tokenized tickets allow for dynamic pricing and customizable resale rules, thereby preventing exorbitant reselling prices. Additionally, these tokens enable frictionless peer-to-peer transactions, fostering a more efficient secondary market. Importantly, they offer improved data transparency and audience insights, creating the potential for personalized user experiences. Thus, tokenization of event tickets is a significant leap towards a more secure, user-centric event industry, which is why it's so critical to build a smooth UX platform like Tixo to facilitate this thesis.
-
-Aurora Entertainment, Digital Media, and NFTs Challenges: Tixo secures data privacy and intellectual property through blockchain technology. Patrons purchase unique tokenized tickets, ensuring rightful ownership and combating counterfeit. Artist commissions can be encoded into smart contracts, ensuring transparent, instant payments upon ticket sale. Any resale triggers automated commission payouts, discouraging middlemen fee scalping. Simultaneously, anonymous yet verifiable audience data analytics enhance user experiences while respecting privacy. Tixo, through Aurora, revolutionizes the event industry, addressing its prevalent challenges.
