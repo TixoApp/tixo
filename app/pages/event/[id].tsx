@@ -445,7 +445,7 @@ function EventPage() {
                   )}
                 </VStack>
                 <VStack w="100%">
-                  {event && event.tokenAddress && !isOwner ? (
+                  {needsVerification ? (
                     <Button
                       onClick={() => signMessage?.()}
                       className={styles.button}
@@ -544,7 +544,7 @@ function EventPage() {
                             onClick={handleMintTicket}
                           >
                             <Image
-                              src="/fantom.png"
+                              src="/fantom1.png"
                               className={styles.fantom}
                             />
                             <Text className={styles.buttonLabel}>

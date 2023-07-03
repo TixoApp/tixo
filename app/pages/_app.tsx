@@ -12,18 +12,17 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { publicProvider } from "wagmi/providers/public";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
-import { fantomTestnet } from "wagmi/chains";
+import { fantom } from "wagmi/chains";
 import merge from "lodash.merge";
 import Head from "next/head";
 import Navbar from "@components/Navbar";
 
-export const TIXO_API_URL = process.env.NEXT_PUBLIC_TIXO_API_URL;
-export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
+export const TIXO_API_URL =
+  process.env.NEXT_PUBLIC_ENV === "prod"
+    ? process.env.NEXT_PUBLIC_API_PROD
+    : process.env.NEXT_PUBLIC_API_DEV;
 
-const { chains, provider } = configureChains(
-  [fantomTestnet],
-  [publicProvider()]
-);
+const { chains, provider } = configureChains([fantom], [publicProvider()]);
 
 const { connectors } = getDefaultWallets({
   appName: "Tixo",

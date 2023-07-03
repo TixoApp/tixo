@@ -230,10 +230,7 @@ function App() {
           <Link href={`/event/${eventId}`}>
             <Button className={styles.button}>Go to event</Button>
           </Link>
-          <ChakraLink
-            href={`https://testnet.ftmscan.com/tx/${txnHash}`}
-            isExternal
-          >
+          <ChakraLink href={`https://ftmscan.com/tx/${txnHash}`} isExternal>
             <Button className={styles.button}>View transaction</Button>
           </ChakraLink>
         </HStack>
@@ -357,7 +354,7 @@ function App() {
                   ></Input>
                   <InputRightElement w="200px" justifyContent="flex-end">
                     <Text color="rgba(255,255,255,0.5)" pr="20px">
-                      {costPerTicket * 0.00052} aETH
+                      {costPerTicket * 0.318} FTM
                     </Text>
                   </InputRightElement>
                   {/* </VStack> */}

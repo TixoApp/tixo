@@ -5,17 +5,17 @@ async function main() {
     const tokenFactory = await hre.ethers.getContractFactory("FantomHackerNFT");
 
     const token = await tokenFactory.attach(
-      "0x440551d6b96D37C04656EB41594fECe89249bd3a"
+      "0x14544B8C7a23Cd6A669ed9C591E2b9d378DFce92"
     );
 
     console.log("FantomHackerNFT attached to:", token.address);
 
-    console.log("Creating event...");
+    console.log("Minting...");
 
     const txn = await token.safeMint(
-      "0xDfCce953c63B353B117aa41D99E52c3f26DE4161",
+      "0xD47757f0707A0D8800e6DFb9354FAAE1c79Ac3A2",
       1,
-      "https://bafybeiazbvmb3adxkyb3ov3y7isxzn7n6ctr4xt7fuzotmjcmdcutlpx34.ipfs.w3s.link/metadata.json"
+      "https://bafybeidx6dbqqww5rjuuq5zuij6rspob7whff4k4libqjxj3d4q2csrxjq.ipfs.w3s.link/metadata.json"
     );
     await txn.wait();
     console.log("event created ", txn);
