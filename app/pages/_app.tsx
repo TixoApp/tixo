@@ -8,7 +8,6 @@ import {
   RainbowKitProvider,
   Theme,
   darkTheme,
-  Chain,
 } from "@rainbow-me/rainbowkit";
 import { publicProvider } from "wagmi/providers/public";
 import { configureChains, createClient, WagmiConfig } from "wagmi";
@@ -21,6 +20,8 @@ export const TIXO_API_URL =
   process.env.NEXT_PUBLIC_ENV === "prod"
     ? process.env.NEXT_PUBLIC_API_PROD
     : process.env.NEXT_PUBLIC_API_DEV;
+
+export const TIXO_CLIENT_URL = process.env.NEXT_PUBLIC_TIXO_CLIENT_URL;
 
 const { chains, provider } = configureChains([fantom], [publicProvider()]);
 
