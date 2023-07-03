@@ -55,7 +55,9 @@ app.get("/event/id/:id", async (req: Request, res: Response) => {
   try {
     await mongoClient.connect();
 
-    const eventsCollection = await mongoClient.db("tixo2").collection("events");
+    const eventsCollection = await mongoClient
+      .db("tixo-fantom")
+      .collection("events");
 
     const { id } = req.params;
 
@@ -72,7 +74,9 @@ app.get("/event/address/:address", async (req: Request, res: Response) => {
   try {
     await mongoClient.connect();
 
-    const eventsCollection = await mongoClient.db("tixo2").collection("events");
+    const eventsCollection = await mongoClient
+      .db("tixo-fantom")
+      .collection("events");
 
     const { address } = req.params;
 
@@ -95,7 +99,7 @@ app.post("/createEvent", async (req: Request, res: Response) => {
   try {
     await mongoClient.connect();
 
-    const eventsCollection = mongoClient.db("tixo2").collection("events");
+    const eventsCollection = mongoClient.db("tixo-fantom").collection("events");
 
     const newEvent: Event = req.body;
 
@@ -120,7 +124,7 @@ app.put("/updateEvent/:id", async (req: Request, res: Response) => {
   try {
     await mongoClient.connect();
 
-    const eventsCollection = mongoClient.db("tixo2").collection("events");
+    const eventsCollection = mongoClient.db("tixo-fantom").collection("events");
 
     const { id } = req.params;
     const eventUpdate = req.body;
@@ -147,7 +151,7 @@ app.post("/validateTicket", async (req: Request, res: Response) => {
   try {
     await mongoClient.connect();
 
-    const eventsCollection = mongoClient.db("tixo2").collection("events");
+    const eventsCollection = mongoClient.db("tixo-fantom").collection("events");
 
     const { eventId, ticketId, address } = req.body;
 
