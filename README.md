@@ -26,7 +26,7 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 - Token-gated private event ticketing
 - UI Customized for ticketing pages
 - Mobile-first ticket purchase flow with multi-payments
-- Payment integration with aETH and Stripe API
+- Payment integration with FTM and Stripe API
 - QR code powered ticket verification process
 - Event monitoring dashboard for tracking purchases
 - Custodial and non-custodial ticket vault solutions
