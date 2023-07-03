@@ -1,6 +1,8 @@
 # TIXO: Next-Generation Ticketing powered by Fantom Blockchain
 
-This project was built for the Fantom Hackathon Q2 2023. View our demo video here: [https://vimeo.com/841980447](https://vimeo.com/841980447)
+This project was built for the Fantom Hackathon Q2 2023. 
+
+View our full demo video here: [https://vimeo.com/841980447](https://vimeo.com/841980447)
 
 ![](/app/public/landing.png)
 
