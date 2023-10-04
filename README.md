@@ -1,6 +1,4 @@
-# TIXO: Next-Generation Ticketing powered by Fantom Blockchain
-
-This project was built for the Fantom Hackathon Q2 2023. 
+# TIXO: Next-Generation Ticketing powered by TRON Blockchain
 
 View our full demo video here: [https://vimeo.com/841980447](https://vimeo.com/841980447)
 
@@ -26,7 +24,7 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 - Token-gated private event ticketing
 - UI Customized for ticketing pages
 - Mobile-first ticket purchase flow with multi-payments
-- Payment integration with FTM and Stripe API
+- Payment integration with TRX and Stripe API
 - QR code powered ticket verification process
 - Event monitoring dashboard for tracking purchases
 - Custodial and non-custodial ticket vault solutions
@@ -34,7 +32,7 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 ## How we built it
 - Frontend: NextJS, Chakra UI, RainbowKit, wagmi hooks
 
-- Payment Rails: Fantom FTM (crypto), Stripe API (fiat)
+- Payment Rails: TRX (crypto), Stripe API (fiat)
 
 - Server: ExpressJS, Hardhat, Web3.Storage
 
@@ -42,11 +40,11 @@ As the future of live event ticketing, TIXO provides a seamless, branded ticketi
 
 ## What's next for TIXO
 
-We want to build the next-generation event ticketing platform powered by the Fantom Blockchain. Some next step features we want to integrate into our application are the following:
+We want to build the next-generation event ticketing platform powered by the TRON Blockchain. Some next step features we want to integrate into our application are the following:
 - Build React-Native mobile app for v2 prototype
 - Tiered ticket sales (i.e. VIP, General Admissions)
 - Seating selection for large venue events
-- Add ERC-20 payment method for token communities on Fantom
+- Add ERC-20 payment method for token communities on TRON
 - Add advanced metrics for host event dashboard
 - Marketing and partnerships to beta test platform launch
 - Export custodial ticket accounts via private key export
